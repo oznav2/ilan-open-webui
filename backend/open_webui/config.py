@@ -101,46 +101,47 @@ DEFAULT_CONFIG = {
         "prompt_suggestions": [
             {
                 "title": [
-                    "Help me study",
-                    "vocabulary for a college entrance exam",
+                    "עזור לי ללמוד",
+                    "אוצר מילים לבחינת כניסה לאוניברסיטה",
                 ],
-                "content": "Help me study vocabulary: write a sentence for me to fill in the blank, and I'll try to pick the correct option.",
+                "content": "עזור לי ללמוד אוצר מילים: כתוב משפט עבורי למלא את החסר, ואני אנסה לבחור את האפשרות הנכונה.",
             },
             {
                 "title": [
-                    "Give me ideas",
-                    "for what to do with my kids' art",
+                    "תן לי רעיונות",
+                    "למה לעשות עם הציורים של הילדים שלי",
                 ],
-                "content": "What are 5 creative things I could do with my kids' art? I don't want to throw them away, but it's also so much clutter.",
+                "content": "מהם 5 דברים יצירתיים שאוכל לעשות עם הציורים של הילדים שלי אותם ציירו בגן הילדים? אני לא רוצה לזרוק אותם, אבל זה גם כל כך הרבה בלגן",
             },
             {
-                "title": ["Tell me a fun fact", "about the Roman Empire"],
-                "content": "Tell me a random fun fact about the Roman Empire",
+                "title": ["ספר לי כל הידוע לך אודות", "המהפכה הצרפתית"],
+                "content": "ספר לי כל הידוע לך אודות המהפכה הצרפתית, ציין את נסיבותיה, ופרט בהרחבה אודות דמויות ואירועים חשובים במהלכה",
             },
             {
                 "title": [
-                    "Show me a code snippet",
-                    "of a website's sticky header",
+                    "הראה לי דוגמא לקטע קוד",
+                    "הממיר קובץ pdf",
                 ],
-                "content": "Show me a code snippet of a website's sticky header in CSS and JavaScript.",
+                "content": "הראה לי דוגמא לקטע קוד בפייתון הממיר קובץ מאנגלית לעברית תוך שמירה על הפרישה של הטקסט כמו בקובץ המקורי -bash ו-Python.",
             },
             {
                 "title": [
-                    "Explain options trading",
-                    "if I'm familiar with buying and selling stocks",
+                    "הסבר לי אודות מסחר באופציות",
+                    "אם אני יודע קצת על קנייה ומכירה של מניות",
                 ],
-                "content": "Explain options trading in simple terms if I'm familiar with buying and selling stocks.",
+                "content": "הסבר את הכללים הבסיסיים למסחר באופציות בבורסה, השתמש במונחים פשוטים בהנחה שאני מכיר קנייה ומכירה של מניות.",
             },
             {
-                "title": ["Overcome procrastination", "give me tips"],
-                "content": "Could you start by asking me about instances when I procrastinate the most and then give me some suggestions to overcome it?",
+                "title": ["התגבר על דחיינות", "תן לי מספר טיפים"],
+                "content": "הסבר את הכללים הבסיסיים למסחר באופציות בבורסה, השתמש במונחים פשוטים בהנחה שאני מכיר קנייה ומכירה של מניות.",
             },
             {
                 "title": [
-                    "Grammar check",
-                    "rewrite it for better readability ",
+                    "תמצת לי את המסמך",
+                    "[לחץ על + כדי להעלות מסמך] ",
+                    "תן לי סיכום תמציתי של הכתוב ",
                 ],
-                "content": 'Check the following sentence for grammar and clarity: "[sentence]". Rewrite it for better readability while maintaining its original meaning.',
+                "content": 'קרא את המסמך בעיון "[document]". צור לי סיכום של הרעיונות המרכזיים, הדגש לי בו נקודות חשובות ועיקריות',
             },
         ],
     },
@@ -540,7 +541,6 @@ Path(TOOLS_DIR).mkdir(parents=True, exist_ok=True)
 FUNCTIONS_DIR = os.getenv("FUNCTIONS_DIR", f"{DATA_DIR}/functions")
 Path(FUNCTIONS_DIR).mkdir(parents=True, exist_ok=True)
 
-
 ####################################
 # LITELLM_CONFIG
 ####################################
@@ -635,13 +635,11 @@ OLLAMA_BASE_URLS = PersistentConfig(
 # OPENAI_API
 ####################################
 
-
 ENABLE_OPENAI_API = PersistentConfig(
     "ENABLE_OPENAI_API",
     "openai.enable",
     os.environ.get("ENABLE_OPENAI_API", "True").lower() == "true",
 )
-
 
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
 OPENAI_API_BASE_URL = os.environ.get("OPENAI_API_BASE_URL", "")
@@ -717,31 +715,28 @@ DEFAULT_PROMPT_SUGGESTIONS = PersistentConfig(
     "ui.prompt_suggestions",
     [
         {
-            "title": ["Help me study", "vocabulary for a college entrance exam"],
-            "content": "Help me study vocabulary: write a sentence for me to fill in the blank, and I'll try to pick the correct option.",
+            "title": ["עזור לי ללמוד", "אוצר מילים לבחינת כניסה לאוניברסיטה"],
+            "content": "עזור לי ללמוד אוצר מילים: כתוב משפט עבורי למלא את החסר, ואני אנסה לבחור את האפשרות הנכונה.",
         },
         {
-            "title": ["Give me ideas", "for what to do with my kids' art"],
-            "content": "What are 5 creative things I could do with my kids' art? I don't want to throw them away, but it's also so much clutter.",
+            "title": ["תן לי רעיונות", "למה לעשות עם הציורים של הילדים שלי"],
+            "content": "מהם 5 דברים יצירתיים שאוכל לעשות עם הציורים של הילדים שלי אותם ציירו בגן הילדים? אני לא רוצה לזרוק אותם, אבל זה גם כל כך הרבה בלגן.",
         },
         {
-            "title": ["Tell me a fun fact", "about the Roman Empire"],
-            "content": "Tell me a random fun fact about the Roman Empire",
+            "title": ["ספר לי כל הידוע לך אודות", "המהפכה הצרפתית"],
+            "content": "ספר לי כל הידוע לך אודות המהפכה הצרפתית, ציין את נסיבותיה, ופרט בהרחבה אודות דמויות ואירועים חשובים במהלכה",
         },
         {
-            "title": ["Show me a code snippet", "of a website's sticky header"],
-            "content": "Show me a code snippet of a website's sticky header in CSS and JavaScript.",
+            "title": ["הראה לי דוגמא לקטע קוד", "הממיר קובץ pdf "],
+            "content": "הראה לי דוגמא לקטע קוד בפייתון הממיר קובץ מאנגלית לעברית תוך שמירה על הפרישה של הטקסט כמו בקובץ המקורי -bash ו-Python.",
         },
         {
-            "title": [
-                "Explain options trading",
-                "if I'm familiar with buying and selling stocks",
-            ],
-            "content": "Explain options trading in simple terms if I'm familiar with buying and selling stocks.",
+            "title": ["הסבר מסחר באופציות", "אם אני מכיר קנייה ומכירה של מניות"],
+            "content": "הסבר את הכללים הבסיסיים למסחר באופציות בבורסה, השתמש במונחים פשוטים בהנחה שאני מכיר קנייה ומכירה של מניות.",
         },
         {
-            "title": ["Overcome procrastination", "give me tips"],
-            "content": "Could you start by asking me about instances when I procrastinate the most and then give me some suggestions to overcome it?",
+            "title": ["התגבר על דחיינות", "תן לי טיפים"],
+            "content": "האם תוכל להתחיל בלשאול אותי על מקרים בהם אני דוחה דברים הכי הרבה ואז לתת לי כמה הצעות להתגבר על זה?",
         },
     ],
 )
@@ -1145,9 +1140,9 @@ RAG_WEB_SEARCH_DOMAIN_FILTER_LIST = PersistentConfig(
     "RAG_WEB_SEARCH_DOMAIN_FILTER_LIST",
     "rag.rag.web.search.domain.filter_list",
     [
-        # "wikipedia.com",
-        # "wikimedia.org",
-        # "wikidata.org",
+         "wikipedia.com",
+         "wikimedia.org",
+         "wikidata.org",
     ],
 )
 
@@ -1412,7 +1407,7 @@ IMAGE_SIZE = PersistentConfig(
 )
 
 IMAGE_STEPS = PersistentConfig(
-    "IMAGE_STEPS", "image_generation.steps", int(os.getenv("IMAGE_STEPS", 50))
+    "IMAGE_STEPS", "image_generation.steps", int(os.getenv("IMAGE_STEPS", 30))
 )
 
 IMAGE_GENERATION_MODEL = PersistentConfig(

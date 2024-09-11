@@ -69,6 +69,7 @@ from open_webui.config import (
     TASK_MODEL,
     TASK_MODEL_EXTERNAL,
     TITLE_GENERATION_PROMPT_TEMPLATE,
+    RESPONSE_BASED_TITLE_GENERATION_PROMPT_TEMPLATE,
     TOOLS_FUNCTION_CALLING_PROMPT_TEMPLATE,
     WEBHOOK_URL,
     WEBUI_AUTH,
@@ -119,6 +120,7 @@ from open_webui.utils.misc import (
 from open_webui.utils.task import (
     moa_response_generation_template,
     search_query_generation_template,
+    response_based_title_generation_template,
     title_generation_template,
     tools_function_calling_generation_template,
 )
@@ -154,20 +156,20 @@ class SPAStaticFiles(StaticFiles):
             else:
                 raise ex
 
-
 print(
     rf"""
-  ___                    __        __   _     _   _ ___ 
- / _ \ _ __   ___ _ __   \ \      / /__| |__ | | | |_ _|
-| | | | '_ \ / _ \ '_ \   \ \ /\ / / _ \ '_ \| | | || | 
-| |_| | |_) |  __/ | | |   \ V  V /  __/ |_) | |_| || | 
- \___/| .__/ \___|_| |_|    \_/\_/ \___|_.__/ \___/|___|
-      |_|                                               
+ _____ _                 _____ _ _                           _ 
+|_   _| |               |  ___| | |                         (_)
+  | | | | __ _ _ __     | |__ | | |__   __ _ _   _  __ _ _ _ 
+  | | | |/ _` | '_ \    |  __|| | '_ \ / _` | | | |/ _` | | |
+ _| |_| | (_| | | | |   | |___| | | | | (_| | |_| | (_| | | |
+|_____|_|\__,_|_| |_|   \____/|_|_| |_|\__,_|\__, |\__,_|_|_|
+                                              __/ |          
+                                             |___/           
 
-      
-v{VERSION} - building the best open-source AI user interface.
+v{VERSION} - building the best open-source AI user interface in Hebrew.
 {f"Commit: {WEBUI_BUILD_HASH}" if WEBUI_BUILD_HASH != "dev-build" else ""}
-https://github.com/open-webui/open-webui
+https://github.com/oznav2/ilan-open-webui
 """
 )
 
@@ -192,10 +194,10 @@ app.state.config.MODEL_FILTER_LIST = MODEL_FILTER_LIST
 
 app.state.config.WEBHOOK_URL = WEBHOOK_URL
 
-
 app.state.config.TASK_MODEL = TASK_MODEL
 app.state.config.TASK_MODEL_EXTERNAL = TASK_MODEL_EXTERNAL
 app.state.config.TITLE_GENERATION_PROMPT_TEMPLATE = TITLE_GENERATION_PROMPT_TEMPLATE
+app.state.config.RESPONSE_BASED_TITLE_GENERATION_PROMPT_TEMPLATE = RESPONSE_BASED_TITLE_GENERATION_PROMPT_TEMPLATE  # Added this line
 app.state.config.SEARCH_QUERY_GENERATION_PROMPT_TEMPLATE = (
     SEARCH_QUERY_GENERATION_PROMPT_TEMPLATE
 )
@@ -1308,13 +1310,13 @@ async def chat_action(action_id: str, form_data: dict, user=Depends(get_verified
 
 # TODO: Refactor task API endpoints below into a separate file
 
-
 @app.get("/api/task/config")
 async def get_task_config(user=Depends(get_verified_user)):
     return {
         "TASK_MODEL": app.state.config.TASK_MODEL,
         "TASK_MODEL_EXTERNAL": app.state.config.TASK_MODEL_EXTERNAL,
         "TITLE_GENERATION_PROMPT_TEMPLATE": app.state.config.TITLE_GENERATION_PROMPT_TEMPLATE,
+        "RESPONSE_BASED_TITLE_GENERATION_PROMPT_TEMPLATE": app.state.config.RESPONSE_BASED_TITLE_GENERATION_PROMPT_TEMPLATE,  # Added this line
         "ENABLE_SEARCH_QUERY": app.state.config.ENABLE_SEARCH_QUERY,
         "SEARCH_QUERY_GENERATION_PROMPT_TEMPLATE": app.state.config.SEARCH_QUERY_GENERATION_PROMPT_TEMPLATE,
         "TOOLS_FUNCTION_CALLING_PROMPT_TEMPLATE": app.state.config.TOOLS_FUNCTION_CALLING_PROMPT_TEMPLATE,
@@ -1325,6 +1327,7 @@ class TaskConfigForm(BaseModel):
     TASK_MODEL: Optional[str]
     TASK_MODEL_EXTERNAL: Optional[str]
     TITLE_GENERATION_PROMPT_TEMPLATE: str
+    RESPONSE_BASED_TITLE_GENERATION_PROMPT_TEMPLATE: str  # Added this line
     SEARCH_QUERY_GENERATION_PROMPT_TEMPLATE: str
     ENABLE_SEARCH_QUERY: bool
     TOOLS_FUNCTION_CALLING_PROMPT_TEMPLATE: str
@@ -1336,6 +1339,9 @@ async def update_task_config(form_data: TaskConfigForm, user=Depends(get_admin_u
     app.state.config.TASK_MODEL_EXTERNAL = form_data.TASK_MODEL_EXTERNAL
     app.state.config.TITLE_GENERATION_PROMPT_TEMPLATE = (
         form_data.TITLE_GENERATION_PROMPT_TEMPLATE
+    )
+    app.state.config.RESPONSE_BASED_TITLE_GENERATION_PROMPT_TEMPLATE = (  # Added this block
+        form_data.RESPONSE_BASED_TITLE_GENERATION_PROMPT_TEMPLATE
     )
     app.state.config.SEARCH_QUERY_GENERATION_PROMPT_TEMPLATE = (
         form_data.SEARCH_QUERY_GENERATION_PROMPT_TEMPLATE
@@ -1349,11 +1355,11 @@ async def update_task_config(form_data: TaskConfigForm, user=Depends(get_admin_u
         "TASK_MODEL": app.state.config.TASK_MODEL,
         "TASK_MODEL_EXTERNAL": app.state.config.TASK_MODEL_EXTERNAL,
         "TITLE_GENERATION_PROMPT_TEMPLATE": app.state.config.TITLE_GENERATION_PROMPT_TEMPLATE,
+        "RESPONSE_BASED_TITLE_GENERATION_PROMPT_TEMPLATE": app.state.config.RESPONSE_BASED_TITLE_GENERATION_PROMPT_TEMPLATE,  # Added this line
         "SEARCH_QUERY_GENERATION_PROMPT_TEMPLATE": app.state.config.SEARCH_QUERY_GENERATION_PROMPT_TEMPLATE,
         "ENABLE_SEARCH_QUERY": app.state.config.ENABLE_SEARCH_QUERY,
         "TOOLS_FUNCTION_CALLING_PROMPT_TEMPLATE": app.state.config.TOOLS_FUNCTION_CALLING_PROMPT_TEMPLATE,
     }
-
 
 @app.post("/api/task/title/completions")
 async def generate_title(form_data: dict, user=Depends(get_verified_user)):
@@ -1372,29 +1378,56 @@ async def generate_title(form_data: dict, user=Depends(get_verified_user)):
 
     print(model_id)
 
-    if app.state.config.TITLE_GENERATION_PROMPT_TEMPLATE != "":
-        template = app.state.config.TITLE_GENERATION_PROMPT_TEMPLATE
-    else:
-        template = """Create a concise, 3-5 word title with an emoji as a title for the prompt in the given language. Suitable Emojis for the summary can be used to enhance understanding but avoid quotation marks or special formatting. RESPOND ONLY WITH THE TITLE TEXT.
+    if "response" in form_data:
+        if app.state.config.RESPONSE_BASED_TITLE_GENERATION_PROMPT_TEMPLATE != "":
+            template = app.state.config.RESPONSE_BASED_TITLE_GENERATION_PROMPT_TEMPLATE
+        else:
+            template = """Create a concise, 3-5 word title with an emoji as a title for the given context in Hebrew. Consider both the prompt and the response. Suitable Emojis for the summary can be used to enhance understanding but avoid quotation marks or special formatting. RESPOND ONLY WITH THE TITLE TEXT.
 
 Examples of titles:
-📉 Stock Market Trends
-🍪 Perfect Chocolate Chip Recipe
-Evolution of Music Streaming
-Remote Work Productivity Tips
-Artificial Intelligence in Healthcare
-🎮 Video Game Development Insights
+📉 מגמות בשוק המניות
+🍪 מתכון עוגיות שוקולד צ'יפס
+התפתחות שירותי מוזיקה
+טיפים לעבודה מרחוק
+בינה מלאכותית ברפואה
+🎮 תובנות בפיתוח משחקים
+
+Prompt: {{prompt:middletruncate:4000}}
+Response: {{response:middletruncate:4000}}"""
+
+        content = response_based_title_generation_template(
+            template,
+            form_data["response"],
+            form_data["prompt"],
+            {
+                "name": user.name,
+                "location": user.info.get("location") if user.info else None,
+            },
+        )
+    else:
+        if app.state.config.TITLE_GENERATION_PROMPT_TEMPLATE != "":
+            template = app.state.config.TITLE_GENERATION_PROMPT_TEMPLATE
+        else:
+            template = """Create a concise, 3-5 word title with an emoji as a title for the prompt in Hebrew. Suitable Emojis for the summary can be used to enhance understanding but avoid quotation marks or special formatting. RESPOND ONLY WITH THE TITLE TEXT.
+
+Examples of titles:
+📉 מגמות בשוק המניות
+🍪 מתכון עוגיות שוקולד צ'יפס
+התפתחות שירותי מוזיקה
+טיפים לעבודה מרחוק
+בינה מלאכותית ברפואה
+🎮 תובנות בפיתוח משחקים
 
 Prompt: {{prompt:middletruncate:8000}}"""
 
-    content = title_generation_template(
-        template,
-        form_data["prompt"],
-        {
-            "name": user.name,
-            "location": user.info.get("location") if user.info else None,
-        },
-    )
+        content = title_generation_template(
+            template,
+            form_data["prompt"],
+            {
+                "name": user.name,
+                "location": user.info.get("location") if user.info else None,
+            },
+        )
 
     payload = {
         "model": model_id,

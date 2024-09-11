@@ -3,9 +3,7 @@ import re
 from datetime import datetime
 from typing import Optional
 
-
 from open_webui.utils.misc import get_last_user_message, get_messages_content
-
 
 def prompt_template(
     template: str, user_name: Optional[str] = None, user_location: Optional[str] = None
@@ -39,7 +37,6 @@ def prompt_template(
 
     return template
 
-
 def replace_prompt_variable(template: str, prompt: str) -> str:
     def replacement_function(match):
         full_match = match.group(0)
@@ -69,6 +66,34 @@ def replace_prompt_variable(template: str, prompt: str) -> str:
     )
     return template
 
+def replace_response_variable(template: str, response: str) -> str:
+    def replacement_function(match):
+        full_match = match.group(0)
+        start_length = match.group(1)
+        end_length = match.group(2)
+        middle_length = match.group(3)
+
+        if full_match == "{{response}}":
+            return response
+        elif start_length is not None:
+            return response[: int(start_length)]
+        elif end_length is not None:
+            return response[-int(end_length) :]
+        elif middle_length is not None:
+            middle_length = int(middle_length)
+            if len(response) <= middle_length:
+                return response
+            start = response[: math.ceil(middle_length / 2)]
+            end = response[-math.floor(middle_length / 2) :]
+            return f"{start}...{end}"
+        return ""
+
+    template = re.sub(
+        r"{{response}}|{{response:start:(\d+)}}|{{response:end:(\d+)}}|{{response:middletruncate:(\d+)}}",
+        replacement_function,
+        template,
+    )
+    return template
 
 def title_generation_template(
     template: str, prompt: str, user: Optional[dict] = None
@@ -85,6 +110,21 @@ def title_generation_template(
 
     return template
 
+def response_based_title_generation_template(
+    template: str, response: str, prompt: str, user: Optional[dict] = None
+) -> str:
+    template = replace_prompt_variable(template, prompt)
+    template = replace_response_variable(template, response)
+    template = prompt_template(
+        template,
+        **(
+            {"user_name": user.get("name"), "user_location": user.get("location")}
+            if user
+            else {}
+        ),
+    )
+
+    return template
 
 def replace_messages_variable(template: str, messages: list[str]) -> str:
     def replacement_function(match):
@@ -122,7 +162,6 @@ def replace_messages_variable(template: str, messages: list[str]) -> str:
 
     return template
 
-
 def search_query_generation_template(
     template: str, messages: list[dict], user: Optional[dict] = None
 ) -> str:
@@ -139,7 +178,6 @@ def search_query_generation_template(
         ),
     )
     return template
-
 
 def moa_response_generation_template(
     template: str, prompt: str, responses: list[str]
@@ -176,7 +214,6 @@ def moa_response_generation_template(
 
     template = template.replace("{{responses}}", responses)
     return template
-
 
 def tools_function_calling_generation_template(template: str, tools_specs: str) -> str:
     template = template.replace("{{TOOLS}}", tools_specs)

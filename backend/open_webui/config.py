@@ -895,7 +895,11 @@ TITLE_GENERATION_PROMPT_TEMPLATE = PersistentConfig(
     "task.title.prompt_template",
     os.environ.get("TITLE_GENERATION_PROMPT_TEMPLATE", ""),
 )
-
+RESPONSE_BASED_TITLE_GENERATION_PROMPT_TEMPLATE = PersistentConfig(
+    "RESPONSE_BASED_TITLE_GENERATION_PROMPT_TEMPLATE",
+    "task.title.prompt_template",
+    os.environ.get("RESPONSE_BASED_TITLE_GENERATION_PROMPT_TEMPLATE", ""),
+)
 ENABLE_SEARCH_QUERY = PersistentConfig(
     "ENABLE_SEARCH_QUERY",
     "task.search.enable",

@@ -90,8 +90,3 @@ llama-index-readers-github
 
 finnhub-python 
 python-dotenv
-
-pdftotext
-arabic_reshaper
-python-bidi
-pathlib

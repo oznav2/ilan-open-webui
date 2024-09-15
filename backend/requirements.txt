@@ -91,7 +91,7 @@ llama-index-readers-github
 finnhub-python 
 python-dotenv
 
-textwarp
+textwrap
 pdftotext
 arabic_reshaper
 python-bidi

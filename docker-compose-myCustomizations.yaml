@@ -23,7 +23,10 @@ services:
               capabilities: [gpu]
 
   open-webui:
-    image: ghcr.io/oznav2/open-webui:my-customizations  # Updated to use your custom image
+    build:
+      context: .
+      dockerfile: Dockerfile.local
+    image: ghcr.io/oznav2/open-webui:my-customizations
     pull_policy: always
     container_name: open-webui
     expose:
@@ -55,7 +58,7 @@ services:
             - driver: nvidia
               count: all
               capabilities: [gpu]
-
+              
   pipelines:
     pull_policy: always
     image: ghcr.io/open-webui/pipelines:main

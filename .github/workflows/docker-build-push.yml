@@ -50,11 +50,23 @@ jobs:
         with:
           context: .
           file: ./Dockerfile.local
-          push: true
+          push: false  # Changed to false for debugging
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          load: true
 
-      - name: Image digest
-        run: echo ${{ steps.docker_build.outputs.digest }}
+      - name: Debug - Display Docker build output
+        if: failure()
+        run: |
+          docker build -f Dockerfile.local . 2>&1 | tee build_output.log
+          echo "Last 1000 lines of build output:"
+          tail -n 1000 build_output.log
+
+      - name: Upload build log as artifact
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: docker-build-log
+          path: build_output.log

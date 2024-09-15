@@ -1,18 +1,31 @@
-# Use the official image as base
-FROM ghcr.io/open-webui/open-webui:${WEBUI_DOCKER_TAG-main}
 # syntax=docker/dockerfile:1
 # Initialize device type args
 ARG USE_CUDA=true
 ARG USE_OLLAMA=false
 ARG USE_CUDA_VER=cu121
 ARG CACHEBUST
+
 ARG USE_EMBEDDING_MODEL=intfloat/multilingual-e5-large 
 ARG USE_RERANKING_MODEL=""
 ARG BUILD_HASH=dev-build
 ARG UID=0
 ARG GID=0
 
-# WebUI backend
+######## WebUI frontend ########
+FROM --platform=$BUILDPLATFORM node:21-alpine3.19 as build
+ARG BUILD_HASH
+
+WORKDIR /app
+RUN echo "$CACHEBUST"
+
+COPY package.json package-lock.json ./
+RUN npm ci
+
+COPY . .
+ENV APP_BUILD_HASH=${BUILD_HASH}
+RUN npm run build
+
+######## WebUI backend ########
 FROM python:3.11-slim-bookworm as base
 
 # Use args
@@ -46,11 +59,57 @@ ENV ENV=prod \
     RAG_EMBEDDING_MODEL="$USE_EMBEDDING_MODEL_DOCKER" \
     RAG_RERANKING_MODEL="$USE_RERANKING_MODEL_DOCKER" \
     SENTENCE_TRANSFORMERS_HOME="/app/backend/data/cache/embedding/models" \
-    HF_HOME="/app/backend/data/cache/embedding/models"
+    HF_HOME="/app/backend/data/cache/embedding/models" \
+    HOME=/root
 
-WORKDIR /app
+# Add your custom environment variables here
+ENV GROQ_API_BASE_URL="https://api.groq.com/openai/v1" \
+    GROQ_API_KEY="" \
+    ANTHROPIC_API_KEY="" \
+    ANTROPHIC_BASE_URL="https://api.anthropic.com/v1/messages" \
+    OPENWEATHERMAP_API_KEY="" \
+    GOOGLE_API_KEY="" \
+    GOOGLE_SEARCH_ID="" \
+    WOLFRAM_APP_ID="" \
+    WOLFARM_BASE_URL="https://www.wolframalpha.com/api/v1/llm-api" \
+    TAVILIY_BASE_URL="https://api.tavily.com/" \
+    TAVILIY_SEARCH_API_KEY="" \
+    SERPLY_BASE_URL="api.serply.io/v1/search/q=search+api" \
+    SERPLY_SEARCH_APY_KEY="" \
+    BRAVE_SEARCH_API_KEYBASE_URL="https://api.search.brave.com/res/v1/web/search" \
+    BRAVE_SEARCH_VIDEO_URL="https://api.search.brave.com/res/v1/videos/search" \
+    BRAVE_SEARCH_IMAGE_URL="https://api.search.brave.com/res/v1/images/search" \
+    BRAVE_SEARCH_API_KEY="" \
+    SERPER_BASE_URL="https://google.serper.dev/search" \
+    SERPER_SEARCH_API_KEY="" \
+    JINA_BASE_URL="https://r.jina.ai/" \
+    JINA_SEARCH_URL="https://s.jina.ai" \
+    JINA_SEARCH_API_KEY="" \
+    BING_BASE_URL="https://api.bing.microsoft.com/v7.0/search" \
+    BING_SEARCH_API_KEY="" \
+    MISTRAL_BASE_URL="https://api.mistral.ai/v1/chat/completions" \
+    MISTRAL_API_KEY="" \
+    FINNHUB_API_KEY="" \
+    OLLAMA_API_BASE_URL="http://localhost:11434/api" \
+    OLLAMA_API_EMBEDDINGS_URL="http://localhost:11434/api/embeddings" \
+    OLLAMA_API_ENDPOINT_URL="http://localhost:11434/api/generate" \
+    OLLAMA_API_CHAT_ENDPOINT_URL="http://localhost:11434/api/chat" \
+    OLLAMA_API_ENDPOINT_URLS="http://localhost:11434/api/urls" \
+    OLLAMA_API_ENDPOINT_UPDATE_URLS="http://localhost:11434/api/urls/update" \
+    OLLAMA_API_ENDPOINT_CONFIG_URL="http://localhost:11434/api/config" \
+    OLLAMA_API_ENDPOINT_CONFIG_UPDATE_URL="http://localhost:11434/api/config/update" \
+    OLLAMA_API_VERSION_URL="http://localhost:11434/api/version" \
+    OLLAMA_API_TAGS_URL="http://localhost:11434/api/tags" \
+    OLLAMA_API_CREATE_URL="http://localhost:11434/api/create" \
+    OLLAMA_API_DELETE_URL="http://localhost:11434/api/delete" \
+    OLLAMA_API_PULL_URL="http://localhost:11434/api/pull" \
+    OLLAMA_API_MODELS_DOWNLOAD_URL="http://localhost:11434/api/models/download" \
+    OLLAMA_API_MODELS_UPLOAD_URL="http://localhost:11434/api/models/upload" \
+    USE_OLLAMA_DOCKER="false" \
+    CORS_ALLOW_ORIGIN="*"
 
-ENV HOME /root
+WORKDIR /app/backend
+
 # Create user and group if not root
 RUN if [ $UID -ne 0 ]; then \
     if [ $GID -ne 0 ]; then \
@@ -65,7 +124,7 @@ RUN echo -n 00000000-0000-0000-0000-000000000000 > $HOME/.cache/chroma/telemetry
 # Make sure the user has access to the app and root directory
 RUN chown -R $UID:$GID /app $HOME
 
-# Install build dependencies and other necessary packages
+# Install system dependencies
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     build-essential \
@@ -85,22 +144,27 @@ RUN apt-get update && \
     fi && \
     rm -rf /var/lib/apt/lists/*
 
-# Copy your local files
-COPY . /app
-
 # Install Python dependencies
-RUN pip3 install uv && \
+COPY --chown=$UID:$GID ./backend/requirements.txt ./requirements.txt
+
+RUN pip3 install --upgrade pip && \
     if [ "$USE_CUDA" = "true" ]; then \
-    pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/$USE_CUDA_DOCKER_VER --no-cache-dir && \
-    uv pip install --system -r /app/backend/requirements.txt --no-cache-dir && \
-    python -c "import os; from sentence_transformers import SentenceTransformer; SentenceTransformer(os.environ['RAG_EMBEDDING_MODEL'], device='cpu')" && \
-    python -c "import os; from faster_whisper import WhisperModel; WhisperModel(os.environ['WHISPER_MODEL'], device='cpu', compute_type='int8', download_root=os.environ['WHISPER_MODEL_DIR'])"; \
+    pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/$USE_CUDA_DOCKER_VER --no-cache-dir; \
     else \
-    pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu --no-cache-dir && \
-    uv pip install --system -r /app/backend/requirements.txt --no-cache-dir && \
-    python -c "import os; from sentence_transformers import SentenceTransformer; SentenceTransformer(os.environ['RAG_EMBEDDING_MODEL'], device='cpu')" && \
-    python -c "import os; from faster_whisper import WhisperModel; WhisperModel(os.environ['WHISPER_MODEL'], device='cpu', compute_type='int8', download_root=os.environ['WHISPER_MODEL_DIR'])"; \
-    fi
+    pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu --no-cache-dir; \
+    fi && \
+    pip3 install -r requirements.txt --no-cache-dir
+
+# Ensure the data directory exists and has correct permissions
+RUN mkdir -p /app/backend/data && chown -R $UID:$GID /app/backend/data
+
+# Copy built frontend files
+COPY --chown=$UID:$GID --from=build /app/build /app/build
+COPY --chown=$UID:$GID --from=build /app/CHANGELOG.md /app/CHANGELOG.md
+COPY --chown=$UID:$GID --from=build /app/package.json /app/package.json
+
+# Copy backend files
+COPY --chown=$UID:$GID ./backend .
 
 EXPOSE 8080
 
@@ -111,4 +175,4 @@ USER $UID:$GID
 ARG BUILD_HASH
 ENV WEBUI_BUILD_VERSION=${BUILD_HASH}
 
-CMD [ "bash", "/app/backend/start.sh"]
+CMD [ "bash", "start.sh"]

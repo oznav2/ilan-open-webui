@@ -3,8 +3,8 @@ name: Docker Build and Push
 on:
   push:
     branches:
-      - my-customization  # Adjust this to your branch name
-  workflow_dispatch:  # Allows manual triggering
+      - my-customizations
+  workflow_dispatch:
 
 env:
   REGISTRY: ghcr.io
@@ -26,13 +26,16 @@ jobs:
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.MY_GITHUB_TOKEN }}
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@v4
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=sha
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v4

@@ -1,0 +1,122 @@
+services:
+  ollama:
+    image: ollama/ollama:${OLLAMA_DOCKER_TAG-latest}
+    container_name: ollama
+    expose:
+     - 11434
+    ports:
+     - 11434:11434
+    pull_policy: always
+    tty: true
+    restart: always
+    healthcheck:
+      test: ollama --version || exit 1
+    command: serve
+    volumes:
+      - /home/ilan/my_models/:/root/.ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  open-webui:
+    image: ghcr.io/oznav2/open-webui:my-customizations  # Updated to use your custom image
+    pull_policy: always
+    container_name: open-webui
+    expose:
+     - 8080
+    ports:
+     - 8080:8080
+    environment:
+      - ENV=prod
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - OLLAMA_API_BASE_URL=http://ollama:11434/api
+      - OPENAI_API_BASE_URL=http://pipelines:9099
+      - OPENAI_API_KEY=0p3n-w3bu!
+    env_file: .env
+    healthcheck:
+      test: curl --silent --fail http://localhost:${PORT:-8080}/health | jq -ne 'input.status == true' || exit 1
+    command: ['bash', 'start.sh']
+    volumes:
+      - /home/ilan/open-webui-data:/app/backend/data
+    depends_on:
+      ollama:
+        condition: service_healthy
+    extra_hosts:
+     - host.docker.internal:host-gateway
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  pipelines:
+    pull_policy: always
+    image: ghcr.io/open-webui/pipelines:main
+    container_name: pipelines
+    volumes:
+        - /home/ilan/pipelines/pipelines:/app/pipelines
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    restart: unless-stopped
+    expose:
+     - 9099
+    ports:
+      - 9099:9099
+    depends_on:
+      - langfuse
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  langfuse:
+    image: langfuse/langfuse:latest
+    depends_on:
+      langfuse-db:
+        condition: service_healthy
+    expose:
+     - 4000
+    ports:
+      - "4000:4000"
+    pull_policy: always
+    environment:
+      - DATABASE_PORT=${DATABASE_PORT:-5432}
+      - DATABASE_USERNAME=${DATABASE_USERNAME:-root}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD:-root}
+      - DATABASE_URL=postgresql://postgres:postgres@langfuse-db:5432/postgres
+      - NEXTAUTH_SECRET=mysecret
+      - SALT=mysalt
+      - NEXTAUTH_URL=http://localhost:4000
+      - TELEMETRY_ENABLED=${TELEMETRY_ENABLED:-true}
+      - LANGFUSE_ENABLE_EXPERIMENTAL_FEATURES=${LANGFUSE_ENABLE_EXPERIMENTAL_FEATURES:-false}
+      - PORT=4000
+
+  langfuse-db:
+    image: postgres
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - langfuse_database_data:/var/lib/postgresql/data
+
+volumes:
+  langfuse_database_data: {}

@@ -20,6 +20,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -50,12 +52,14 @@ jobs:
         with:
           context: .
           file: ./Dockerfile.local
-          push: false  # Changed to false for debugging
+          push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          load: true
+
+      - name: Image digest
+        run: echo ${{ steps.docker_build.outputs.digest }}
 
       - name: Debug - Display Docker build output
         if: failure()

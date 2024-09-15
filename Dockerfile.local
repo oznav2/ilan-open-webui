@@ -148,6 +148,8 @@ RUN apt-get update && \
 COPY --chown=$UID:$GID ./backend/requirements.txt ./requirements.txt
 
 RUN set -x && \
+    echo "Contents of requirements.txt:" && \
+    cat requirements.txt && \
     pip3 install --upgrade pip && \
     pip3 --version && \
     if [ "$USE_CUDA" = "true" ]; then \
@@ -159,7 +161,6 @@ RUN set -x && \
     fi && \
     echo "Installing requirements" && \
     pip3 install -r requirements.txt --no-cache-dir || exit 1
-
 # Ensure the data directory exists and has correct permissions
 RUN mkdir -p /app/backend/data && chown -R $UID:$GID /app/backend/data
 

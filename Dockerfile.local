@@ -19,6 +19,9 @@ WORKDIR /app
 RUN echo "$CACHEBUST"
 
 COPY package.json package-lock.json ./
+# Increase npm timeout and add retries
+RUN npm config set fetch-retry-maxtimeout 600000
+RUN npm config set fetch-timeout 600000
 RUN npm ci
 
 COPY . .

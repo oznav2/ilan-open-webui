@@ -20,8 +20,8 @@ RUN echo "$CACHEBUST"
 
 COPY package.json package-lock.json ./
 # Increase npm timeout and add retries
-RUN npm config set fetch-retry-maxtimeout 600000
-RUN npm config set fetch-timeout 600000
+RUN npm config set fetch-retry-maxtimeout 1000000
+RUN npm config set fetch-timeout 1000000
 RUN npm ci
 
 COPY . .
@@ -63,7 +63,9 @@ ENV ENV=prod \
     RAG_RERANKING_MODEL="$USE_RERANKING_MODEL_DOCKER" \
     SENTENCE_TRANSFORMERS_HOME="/app/backend/data/cache/embedding/models" \
     HF_HOME="/app/backend/data/cache/embedding/models" \
-    HOME=/root
+    HOME=/root \
+    GIT_PYTHON_REFRESH=quiet \
+    PATH="/usr/bin:${PATH}"
 
 # Add your custom environment variables here
 ENV GROQ_API_BASE_URL="https://api.groq.com/openai/v1" \
@@ -127,7 +129,7 @@ RUN echo -n 00000000-0000-0000-0000-000000000000 > $HOME/.cache/chroma/telemetry
 # Make sure the user has access to the app and root directory
 RUN chown -R $UID:$GID /app $HOME
 
-# Install system dependencies
+# Install system dependencies including git
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     build-essential \
@@ -141,11 +143,19 @@ RUN apt-get update && \
     python3-dev \
     ffmpeg \
     libsm6 \
-    libxext6 && \
+    libxext6 \
+    git && \
     if [ "$USE_OLLAMA" = "true" ]; then \
     curl -fsSL https://ollama.com/install.sh | sh; \
     fi && \
     rm -rf /var/lib/apt/lists/*
+
+# Ensure git is in the PATH and set GIT_PYTHON_GIT_EXECUTABLE
+ENV PATH="/usr/bin:${PATH}" \
+    GIT_PYTHON_GIT_EXECUTABLE=/usr/bin/git
+
+# Verify git installation
+RUN git --version
 
 # Install Python dependencies
 COPY --chown=$UID:$GID ./backend/requirements.txt ./requirements.txt
@@ -164,6 +174,7 @@ RUN set -x && \
     fi && \
     echo "Installing requirements" && \
     pip3 install -r requirements.txt --no-cache-dir || exit 1
+
 # Ensure the data directory exists and has correct permissions
 RUN mkdir -p /app/backend/data && chown -R $UID:$GID /app/backend/data
 
@@ -184,4 +195,5 @@ USER $UID:$GID
 ARG BUILD_HASH
 ENV WEBUI_BUILD_VERSION=${BUILD_HASH}
 
+RUN echo "export GIT_PYTHON_REFRESH=quiet" >> /etc/profile.d/git_python.sh
 CMD [ "bash", "start.sh"]

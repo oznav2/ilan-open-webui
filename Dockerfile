@@ -195,7 +195,6 @@ RUN chown -R $UID:$GID /app $HOME
 #Install build dependencies and other necessary packages
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-    git \
     build-essential \
     cmake \
     g++ \

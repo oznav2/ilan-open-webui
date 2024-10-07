@@ -1,4 +1,19 @@
+<<<<<<< HEAD
+
 # Open WebUI👋
+
+#  ![GitHub stars](https://img.shields.io/github/stars/open-webui/open-webui?style=social)
+ ![GitHub forks](https://img.shields.io/github/forks/open-webui/open-webui?style=social)
+ ![GitHub watchers](https://img.shields.io/github/watchers/open-webui/open-webui?style=social)
+ ![GitHub repo size](https://img.shields.io/github/repo-size/open-webui/open-webui)
+ ![GitHub language count](https://img.shields.io/github/languages/count/open-webui/open-webui)
+ ![GitHub top language](https://img.shields.io/github/languages/top/open-webui/open-webui)
+ ![GitHub last commit](https://img.shields.io/github/last-commit/open-webui/open-webui?color=red)
+ ![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Follama-webui%2Follama-wbui&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false)
+[  ![Discord](https://img.shields.io/badge/Discord-Open_WebUI-blue?logo=discord&logoColor=white)](https://discord.gg/5rJgQTnV4s)
+[  ![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/tjbck)
+
+# Open WebUI 👋
 
  ![GitHub stars](https://img.shields.io/github/stars/open-webui/open-webui?style=social)
  ![GitHub forks](https://img.shields.io/github/forks/open-webui/open-webui?style=social)
@@ -10,6 +25,8 @@
  ![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Follama-webui%2Follama-wbui&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false)
 [ ![Discord](https://img.shields.io/badge/Discord-Open_WebUI-blue?logo=discord&logoColor=white)](https://discord.gg/5rJgQTnV4s)
 [ ![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/tjbck)
+
+> > > > > > > main
 
 Open WebUI is an [extensible](https://github.com/open-webui/pipelines), feature-rich, and user-friendly self-hosted WebUI designed to operate entirely offline. It supports various LLM runners, including Ollama and OpenAI-compatible APIs. For more information, be sure to check out our [Open WebUI Documentation](https://docs.openwebui.com/).
 
@@ -44,16 +61,19 @@ Don't forget to explore our sibling project, [Open WebUI Community](https://open
 ## How to Install 🚀
 
 <<<<<<< HEAD
+
 > \
 > \[!NOTE\]Please note that for certain Docker environments, additional configurations might be needed. If you encounter any connection issues, our detailed guide on [Open WebUI Documentation](https://docs.openwebui.com/) is ready to assist you.
 
 ### Quick Start with Docker 🐳
 
 > \[!WARNING\]
-=======
+> =======
+
 ### Installation via Python pip 🐍
 
 Open WebUI can be installed using pip, the Python package installer. Before proceeding, ensure you're using **Python 3.11** to avoid compatibility issues.
+
 
 1. **Install Open WebUI**:
    Open your terminal and run the following command to install Open WebUI:
@@ -61,7 +81,6 @@ Open WebUI can be installed using pip, the Python package installer. Before proc
    ```bash
    pip install open-webui
    ```
-
 2. **Running Open WebUI**:
    After installation, you can start Open WebUI by executing:
 
@@ -69,16 +88,17 @@ Open WebUI can be installed using pip, the Python package installer. Before proc
    open-webui serve
    ```
 
-This will start the Open WebUI server, which you can access at [http://localhost:8080](http://localhost:8080)
+This will start the Open WebUI server, which you can access at <http://localhost:8080>
 
 ### Quick Start with Docker 🐳
 
-> [!NOTE]  
-> Please note that for certain Docker environments, additional configurations might be needed. If you encounter any connection issues, our detailed guide on [Open WebUI Documentation](https://docs.openwebui.com/) is ready to assist you.
+> \
+> \[!NOTE\]Please note that for certain Docker environments, additional configurations might be needed. If you encounter any connection issues, our detailed guide on [Open WebUI Documentation](https://docs.openwebui.com/) is ready to assist you.
 
-> [!WARNING]
->>>>>>> main
-> When using Docker to install Open WebUI, make sure to include the `-v open-webui:/app/backend/data` in your Docker command. This step is crucial as it ensures your database is properly mounted and prevents any loss of data.
+> \[!WARNING\]
+>
+> > > > > > > main
+> > > > > > > When using Docker to install Open WebUI, make sure to include the `-v open-webui:/app/backend/data` in your Docker command. This step is crucial as it ensures your database is properly mounted and prevents any loss of data.
 
 > \
 > \[!TIP\]If you wish to utilize Open WebUI with Ollama included or CUDA acceleration, we recommend utilizing our official images tagged with either `:cuda` or `:ollama`. To enable CUDA, you must install the [Nvidia CUDA container toolkit](https://docs.nvidia.com/dgx/nvidia-container-runtime-upgrade/) on your Linux/WSL system.
@@ -97,16 +117,20 @@ This will start the Open WebUI server, which you can access at [http://localhost
   ```bash
   docker run -d -p 3000:8080 -e OLLAMA_BASE_URL=https://example.com -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
   ```
+
 <<<<<<< HEAD
-  * **To run Open WebUI with Nvidia GPU support**, use this command:
-=======
 
-- **To run Open WebUI with Nvidia GPU support**, use this command:
->>>>>>> main
+* **To run Open WebUI with Nvidia GPU support**, use this command:
+  =======
 
-  ```bash
-  docker run -d -p 3000:8080 --gpus all --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:cuda
-  ```
+
+* **To run Open WebUI with Nvidia GPU support**, use this command:
+
+> > > > > > > main
+
+```bash
+docker run -d -p 3000:8080 --gpus all --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:cuda
+```
 
 ### Installation for OpenAI API Usage Only
 
@@ -165,7 +189,7 @@ docker run --rm --volume /var/run/docker.sock:/var/run/docker.sock containrrr/wa
 
 In the last part of the command, replace `open-webui` with your container name if it is different.
 
-Check our Migration Guide available in our [Open WebUI Documentation](https://docs.openwebui.com/migration/).
+Check our Migration Guide available in our [Open WebUI Documentation](https://docs.openwebui.com/tutorials/migration/).
 
 ### Using the Dev Branch 🌙
 
@@ -214,6 +238,11 @@ If you have any questions, suggestions, or need assistance, please open an issue
 </a>
 
 
----
-
+# <<<<<<< HEAD
 Created by [Timothy J. Baek](https://github.com/tjbck) - Let's make Open WebUI even more amazing together! 💪
+
+Created by [Timothy Jaeryang Baek](https://github.com/tjbck) - Let's make Open WebUI even more amazing together! 💪
+
+> > > > > > > main
+
+

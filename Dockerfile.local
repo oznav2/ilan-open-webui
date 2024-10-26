@@ -11,8 +11,11 @@ ARG BUILD_HASH=dev-build
 ARG UID=0
 ARG GID=0
 
+# Tiktoken encoding name; models to use can be found at https://huggingface.co/models?library=tiktoken
+ARG USE_TIKTOKEN_ENCODING_NAME="cl100k_base"
+
 ######## WebUI frontend ########
-FROM --platform=$BUILDPLATFORM node:21-alpine3.19 as build
+FROM --platform=$BUILDPLATFORM node:22-alpine3.20 AS build
 ARG BUILD_HASH
 
 WORKDIR /app
@@ -113,6 +116,14 @@ ENV GROQ_API_BASE_URL="https://api.groq.com/openai/v1" \
     USE_OLLAMA_DOCKER="false" \
     CORS_ALLOW_ORIGIN="*"
 
+    
+## Tiktoken model settings ##
+ENV TIKTOKEN_ENCODING_NAME="cl100k_base" \
+TIKTOKEN_CACHE_DIR="/app/backend/data/cache/tiktoken"
+
+## Hugging Face download cache ##
+ENV HF_HOME="/app/backend/data/cache/embedding/models"
+
 WORKDIR /app/backend
 
 # Create user and group if not root
@@ -168,9 +179,11 @@ RUN set -x && \
     if [ "$USE_CUDA" = "true" ]; then \
         echo "Installing CUDA version" && \
         pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/$USE_CUDA_DOCKER_VER --no-cache-dir || exit 1; \
-    else \
+        python -c "import os; import tiktoken; tiktoken.get_encoding(os.environ['TIKTOKEN_ENCODING_NAME'])"; \
+        else \
         echo "Installing CPU version" && \
         pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu --no-cache-dir || exit 1; \
+        python -c "import os; import tiktoken; tiktoken.get_encoding(os.environ['TIKTOKEN_ENCODING_NAME'])"; \
     fi && \
     echo "Installing requirements" && \
     pip3 install -r requirements.txt --no-cache-dir || exit 1

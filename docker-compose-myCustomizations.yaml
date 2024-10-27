@@ -39,6 +39,7 @@ services:
       - OLLAMA_API_BASE_URL=http://ollama:11434/api
       - OPENAI_API_BASE_URL=http://pipelines:9099
       - OPENAI_API_KEY=0p3n-w3bu!
+      - TIKTOKEN_ENCODING_NAME=cl100k_base
     env_file: .env
     healthcheck:
       test: curl --silent --fail http://localhost:${PORT:-8080}/health | jq -ne 'input.status == true' || exit 1

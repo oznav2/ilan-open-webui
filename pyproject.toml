@@ -2,7 +2,7 @@
 name = "open-webui"
 description = "Open WebUI"
 authors = [
-    { name = "Ilan Elhayani", email = "ilan.elhayani@gmail.com" }
+    { name = "Timothy Jaeryang Baek", email = "tim@openwebui.com" }
 ]
 license = { file = "LICENSE" }
 dependencies = [

@@ -196,6 +196,7 @@ RUN echo "Contents of requirements.txt:" && \
             nltk \
             transformers \
             sentencepiece \
+            tiktoken \
             sentence-transformers==3.2.0 && \
         # Install other requirements
         uv pip install --system -r requirements.txt --no-cache-dir && \
@@ -214,6 +215,7 @@ RUN echo "Contents of requirements.txt:" && \
             nltk \
             transformers \
             sentencepiece \
+            tiktoken \
             sentence-transformers==3.2.0 && \
         # Install other requirements
         uv pip install --system -r requirements.txt --no-cache-dir && \

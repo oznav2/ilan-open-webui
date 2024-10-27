@@ -198,10 +198,6 @@ RUN echo "Contents of requirements.txt:" && \
             sentence-transformers==3.2.0 && \
         # Install other requirements
         uv pip install --system -r requirements.txt --no-cache-dir && \
-        # Verify critical packages
-        python -c "import torch; print('PyTorch version:', torch.__version__)" && \
-        python -c "import sentence_transformers; print('sentence-transformers version:', sentence_transformers.__version__)" && \
-        python -c "import tiktoken; print('tiktoken version:', tiktoken.__version__)" && \
         # Load and verify models
         python -c "import os; from sentence_transformers import SentenceTransformer; print('Loading model:', os.environ.get('RAG_EMBEDDING_MODEL', 'default')); model = SentenceTransformer(os.environ.get('RAG_EMBEDDING_MODEL', 'all-MiniLM-L6-v2'), device='cpu'); print('Model loaded successfully')" && \
         python -c "import os; from faster_whisper import WhisperModel; print('Loading Whisper model:', os.environ.get('WHISPER_MODEL', 'default')); model = WhisperModel(os.environ.get('WHISPER_MODEL', 'tiny'), device='cpu', compute_type='int8', download_root=os.environ.get('WHISPER_MODEL_DIR', '/tmp/whisper')); print('Whisper model loaded successfully')" && \
@@ -220,11 +216,6 @@ RUN echo "Contents of requirements.txt:" && \
             sentence-transformers==3.2.0 && \
         # Install other requirements
         uv pip install --system -r requirements.txt --no-cache-dir && \
-        # Verify critical packages
-        python -c "import torch; print('PyTorch version:', torch.__version__)" && \
-        python -c "import sentence_transformers; print('sentence-transformers version:', sentence_transformers.__version__)" && \
-        python -c "import tiktoken; print('tiktoken version:', tiktoken.__version__)" && \
-        # Load and verify models
         python -c "import os; from sentence_transformers import SentenceTransformer; print('Loading model:', os.environ.get('RAG_EMBEDDING_MODEL', 'default')); model = SentenceTransformer(os.environ.get('RAG_EMBEDDING_MODEL', 'all-MiniLM-L6-v2'), device='cpu'); print('Model loaded successfully')" && \
         python -c "import os; from faster_whisper import WhisperModel; print('Loading Whisper model:', os.environ.get('WHISPER_MODEL', 'default')); model = WhisperModel(os.environ.get('WHISPER_MODEL', 'tiny'), device='cpu', compute_type='int8', download_root=os.environ.get('WHISPER_MODEL_DIR', '/tmp/whisper')); print('Whisper model loaded successfully')" && \
         python -c "import os; import tiktoken; print('Loading tokenizer:', os.environ.get('TIKTOKEN_ENCODING_NAME', 'cl100k_base')); enc = tiktoken.get_encoding(os.environ.get('TIKTOKEN_ENCODING_NAME', 'cl100k_base')); print('Tokenizer loaded successfully')"; \

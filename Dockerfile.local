@@ -174,15 +174,11 @@ RUN git --version
 # Install Python dependencies
 COPY --chown=$UID:$GID ./backend/requirements.txt ./requirements.txt
 
-RUN echo "=========STARTING PYTHON DEPENDENCIES INSTALLATION========" && \
+RUN pip3 install uv && \
+    echo "=========STARTING PYTHON DEPENDENCIES INSTALLATION========" && \
     # Update pip and install basic requirements
     pip3 install --upgrade pip && \
     pip3 --version && \
-    # Install core dependencies
-    pip3 install --no-cache-dir \
-        setuptools \
-        wheel \
-        uv && \
     # Install specific ML packages
     pip3 install --no-cache-dir \
         tiktoken \
@@ -191,13 +187,12 @@ RUN echo "=========STARTING PYTHON DEPENDENCIES INSTALLATION========" && \
     echo "========Installing CUDA version======" && \
     pip3 install torch torchvision torchaudio --no-cache-dir && \
     # Install requirements.txt
-    pip3 install -r requirements.txt --no-cache-dir && \
+    uv pip install -r requirements.txt --no-cache-dir && \
     # Verify imports and model loading
     python -c "import os; from sentence_transformers import SentenceTransformer; SentenceTransformer(os.environ['RAG_EMBEDDING_MODEL'], device='cpu')" && \
     python -c "import os; from faster_whisper import WhisperModel; WhisperModel(os.environ['WHISPER_MODEL'], device='cpu', compute_type='int8', download_root=os.environ['WHISPER_MODEL_DIR'])"; \
     python -c "import os; import tiktoken; tiktoken.get_encoding(os.environ['TIKTOKEN_ENCODING_NAME'])"; \
     # Clean up
-    apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     rm -rf /var/cache/apt/* && \
     # Set permissions

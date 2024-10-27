@@ -169,24 +169,25 @@ RUN git --version
 # Install Python dependencies
 COPY --chown=$UID:$GID ./backend/requirements.txt ./requirements.txt
 
-RUN set -x && \
-    echo "Contents of requirements.txt:" && \
+RUN echo "Contents of requirements.txt:" && \
     cat requirements.txt && \
     pip3 install --upgrade pip && \
     pip3 --version && \
+    pip3 install uv && \
     if [ "$USE_CUDA" = "true" ]; then \
         echo "Installing CUDA version" && \
-        pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/$USE_CUDA_DOCKER_VER --no-cache-dir || exit 1; \
-        pip3 install tiktoken --no-cache-dir || exit 1; \
-        python3 -c "import os; import tiktoken; tiktoken.get_encoding('cl100k_base')" || exit 1; \
-        else \
+        pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/$USE_CUDA_DOCKER_VER --no-cache-dir && \
+        pip3 install tiktoken --no-cache-dir && \
+        python3 -c "import os; import tiktoken; tiktoken.get_encoding(os.environ['TIKTOKEN_ENCODING_NAME'])" && \
+        uv pip install --system -r requirements.txt --no-cache-dir; \
+    else \
         echo "Installing CPU version" && \
-        pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu --no-cache-dir || exit 1; \
-        pip3 install tiktoken --no-cache-dir || exit 1; \
-        python3 -c "import os; import tiktoken; tiktoken.get_encoding('cl100k_base')" || exit 1; \
+        pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu --no-cache-dir && \
+        pip3 install tiktoken --no-cache-dir && \
+        python3 -c "import os; import tiktoken; tiktoken.get_encoding(os.environ['TIKTOKEN_ENCODING_NAME'])" && \
+        uv pip install --system -r requirements.txt --no-cache-dir; \
     fi && \
-    echo "Installing requirements" && \
-    pip3 install -r requirements.txt --no-cache-dir || exit 1
+    chown -R $UID:$GID /app/backend/data/
 
 # Ensure the data directory exists and has correct permissions
 RUN mkdir -p /app/backend/data && chown -R $UID:$GID /app/backend/data

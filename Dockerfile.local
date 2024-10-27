@@ -174,8 +174,7 @@ RUN git --version
 # Install Python dependencies
 COPY --chown=$UID:$GID ./backend/requirements.txt ./requirements.txt
 
-RUN set -x && \
-    echo "=========STARTING PYTHON DEPENDECIES INSTALLATION========" && \
+RUN echo "=========STARTING PYTHON DEPENDECIES INSTALLATION========" && \
     pip3 install --upgrade pip && \
     pip3 --version && \
     pip3 install --no-cache-dir \
@@ -197,7 +196,7 @@ RUN set -x && \
         # python -c "import os; from sentence_transformers import SentenceTransformer; SentenceTransformer(os.environ['RAG_EMBEDDING_MODEL'], device='cpu')" && \
         # python -c "import os; from faster_whisper import WhisperModel; WhisperModel(os.environ['WHISPER_MODEL'], device='cpu', compute_type='int8', download_root=os.environ['WHISPER_MODEL_DIR'])"; \
         # python -c "import os; import tiktoken; tiktoken.get_encoding(os.environ['TIKTOKEN_ENCODING_NAME'])"; \
-    fi && \
+    fi \
     # Clean up
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \

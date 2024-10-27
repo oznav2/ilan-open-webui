@@ -44,6 +44,7 @@ ARG UID
 ARG GID
 ARG USE_TIKTOKEN_ENCODING_NAME
 
+
 # Set environment variables
 ENV ENV=prod \
     PORT=8080 \
@@ -71,7 +72,7 @@ ENV ENV=prod \
     GIT_PYTHON_REFRESH=quiet \
     PATH="/usr/bin:${PATH}" \
     TIKTOKEN_ENCODING_NAME=${USE_TIKTOKEN_ENCODING_NAME}
-
+    
     
 ## Tiktoken cache dir  ##
 ENV TIKTOKEN_CACHE_DIR="/app/backend/data/cache/tiktoken"
@@ -199,8 +200,8 @@ RUN echo "Contents of requirements.txt:" && \
         # Install other requirements
         uv pip install --system -r requirements.txt --no-cache-dir && \
         # Load and verify models
-        python -c "import os; from sentence_transformers import SentenceTransformer; print('Loading model:', os.environ.get('RAG_EMBEDDING_MODEL', 'default')); model = SentenceTransformer(os.environ.get('RAG_EMBEDDING_MODEL', 'all-MiniLM-L6-v2'), device='cpu'); print('Model loaded successfully')" && \
-        python -c "import os; from faster_whisper import WhisperModel; print('Loading Whisper model:', os.environ.get('WHISPER_MODEL', 'default')); model = WhisperModel(os.environ.get('WHISPER_MODEL', 'tiny'), device='cpu', compute_type='int8', download_root=os.environ.get('WHISPER_MODEL_DIR', '/tmp/whisper')); print('Whisper model loaded successfully')" && \
+        python -c "import os; from sentence_transformers import SentenceTransformer; print('Loading model:', os.environ.get('RAG_EMBEDDING_MODEL', 'sentence-transformers/all-MiniLM-L6-v2')); model = SentenceTransformer(os.environ.get('RAG_EMBEDDING_MODEL', 'sentence-transformers/all-MiniLM-L6-v2'), device='cpu'); print('Model loaded successfully')" && \
+        python -c "import os; from faster_whisper import WhisperModel; print('Loading Whisper model:', os.environ.get('WHISPER_MODEL', 'ivrit-ai/faster-whisper-v2-d3-e3')); model = WhisperModel(os.environ.get('WHISPER_MODEL', 'ivrit-ai/faster-whisper-v2-d3-e3'), device='cpu', compute_type='int8', download_root=os.environ.get('WHISPER_MODEL_DIR', '/app/backend/data/cache/whisper/models')); print('Whisper model loaded successfully')" && \
         python -c "import os; import tiktoken; print('Loading tokenizer:', os.environ.get('TIKTOKEN_ENCODING_NAME', 'cl100k_base')); enc = tiktoken.get_encoding(os.environ.get('TIKTOKEN_ENCODING_NAME', 'cl100k_base')); print('Tokenizer loaded successfully')"; \
     else \
         echo "Installing CPU version" && \
@@ -216,8 +217,8 @@ RUN echo "Contents of requirements.txt:" && \
             sentence-transformers==3.2.0 && \
         # Install other requirements
         uv pip install --system -r requirements.txt --no-cache-dir && \
-        python -c "import os; from sentence_transformers import SentenceTransformer; print('Loading model:', os.environ.get('RAG_EMBEDDING_MODEL', 'default')); model = SentenceTransformer(os.environ.get('RAG_EMBEDDING_MODEL', 'all-MiniLM-L6-v2'), device='cpu'); print('Model loaded successfully')" && \
-        python -c "import os; from faster_whisper import WhisperModel; print('Loading Whisper model:', os.environ.get('WHISPER_MODEL', 'default')); model = WhisperModel(os.environ.get('WHISPER_MODEL', 'tiny'), device='cpu', compute_type='int8', download_root=os.environ.get('WHISPER_MODEL_DIR', '/tmp/whisper')); print('Whisper model loaded successfully')" && \
+        python -c "import os; from sentence_transformers import SentenceTransformer; print('Loading model:', os.environ.get('RAG_EMBEDDING_MODEL', 'sentence-transformers/all-MiniLM-L6-v2')); model = SentenceTransformer(os.environ.get('RAG_EMBEDDING_MODEL', 'sentence-transformers/all-MiniLM-L6-v2'), device='cpu'); print('Model loaded successfully')" && \
+        python -c "import os; from faster_whisper import WhisperModel; print('Loading Whisper model:', os.environ.get('WHISPER_MODEL', 'ivrit-ai/faster-whisper-v2-d3-e3')); model = WhisperModel(os.environ.get('WHISPER_MODEL', 'ivrit-ai/faster-whisper-v2-d3-e3'), device='cpu', compute_type='int8', download_root=os.environ.get('WHISPER_MODEL_DIR', '/app/backend/data/cache/whisper/models')); print('Whisper model loaded successfully')" && \
         python -c "import os; import tiktoken; print('Loading tokenizer:', os.environ.get('TIKTOKEN_ENCODING_NAME', 'cl100k_base')); enc = tiktoken.get_encoding(os.environ.get('TIKTOKEN_ENCODING_NAME', 'cl100k_base')); print('Tokenizer loaded successfully')"; \
     fi && \
     # Clean up

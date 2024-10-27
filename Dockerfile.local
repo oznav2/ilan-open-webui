@@ -42,6 +42,7 @@ ARG USE_EMBEDDING_MODEL
 ARG USE_RERANKING_MODEL
 ARG UID
 ARG GID
+ARG DEBIAN_FRONTEND=noninteractive
 
 # Set environment variables
 ENV ENV=prod \
@@ -70,7 +71,9 @@ ENV ENV=prod \
     GIT_PYTHON_REFRESH=quiet \
     PATH="/usr/bin:${PATH}" \
     TIKTOKEN_ENCODING_NAME="cl100k_base" \
-    TIKTOKEN_CACHE_DIR="/app/backend/data/cache/tiktoken"
+    TIKTOKEN_CACHE_DIR="/app/backend/data/cache/tiktoken" \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
 
 # Add your custom environment variables here
 ENV GROQ_API_BASE_URL="https://api.groq.com/openai/v1" \
@@ -149,44 +152,50 @@ RUN apt-get update && \
     ffmpeg \
     libsm6 \
     libxext6 \
-    git && \
+    git \
+    python3-pip \
+    python3-wheel \
+    python3-setuptools && \
     if [ "$USE_OLLAMA" = "true" ]; then \
     curl -fsSL https://ollama.com/install.sh | sh; \
     fi && \
     rm -rf /var/lib/apt/lists/*
 
-# Ensure git is in the PATH and set GIT_PYTHON_GIT_EXECUTABLE
-ENV PATH="/usr/bin:${PATH}" \
-    GIT_PYTHON_GIT_EXECUTABLE=/usr/bin/git
-
-# Verify git installation
-RUN git --version
-
-# Create necessary directories
-RUN mkdir -p /app/backend/data/cache/{tiktoken,whisper/models,embedding/models}
+# Create necessary directories and set permissions
+RUN mkdir -p /app/backend/data/cache/{tiktoken,whisper/models,embedding/models} && \
+    chmod -R 777 /app/backend/data/cache
 
 # Install Python dependencies
 COPY --chown=$UID:$GID ./backend/requirements.txt ./requirements.txt
 
-# Modified Python dependencies installation
-RUN set -ex && \
+# Split the Python package installation into separate steps for better error handling
+RUN --mount=type=cache,target=/root/.cache/pip \
+    set -ex && \
     echo "Contents of requirements.txt:" && \
     cat requirements.txt && \
-    pip3 install --upgrade pip && \
-    pip3 --version && \
-    # Install PyTorch first
+    python3 -m pip install --upgrade pip setuptools wheel
+
+# Install PyTorch separately
+RUN --mount=type=cache,target=/root/.cache/pip \
+    set -ex && \
     if [ "$USE_CUDA" = "true" ]; then \
         echo "Installing CUDA version" && \
-        pip3 install --no-cache-dir torch torchvision torchaudio --index-url https://download.pytorch.org/whl/${USE_CUDA_VER}; \
+        python3 -m pip install torch==2.1.0 torchvision==0.16.0 torchaudio==2.1.0 --index-url https://download.pytorch.org/whl/${USE_CUDA_VER}; \
     else \
         echo "Installing CPU version" && \
-        pip3 install --no-cache-dir torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu; \
-    fi && \
-    # Install tiktoken separately
-    pip3 install --no-cache-dir tiktoken && \
-    python3 -c "import os; import tiktoken; tiktoken.get_encoding(os.environ['TIKTOKEN_ENCODING_NAME'])" && \
-    # Install remaining requirements
-    pip3 install --no-cache-dir -r requirements.txt
+        python3 -m pip install torch==2.1.0 torchvision==0.16.0 torchaudio==2.1.0 --index-url https://download.pytorch.org/whl/cpu; \
+    fi
+
+# Install tiktoken separately
+RUN --mount=type=cache,target=/root/.cache/pip \
+    set -ex && \
+    python3 -m pip install tiktoken && \
+    python3 -c "import os; import tiktoken; tiktoken.get_encoding('cl100k_base')"
+
+# Install the rest of the requirements
+RUN --mount=type=cache,target=/root/.cache/pip \
+    set -ex && \
+    python3 -m pip install -r requirements.txt
 
 # Ensure the data directory exists and has correct permissions
 RUN mkdir -p /app/backend/data && chown -R $UID:$GID /app/backend/data

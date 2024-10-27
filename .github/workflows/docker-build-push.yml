@@ -52,6 +52,7 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
 
       - name: Build and push Docker image
+        id: docker_build
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -63,6 +64,9 @@ jobs:
           cache-to: type=gha,mode=max
           build-args: |
             BUILD_HASH=${{ github.sha }}
+            USE_CUDA=true
+            USE_CUDA_VER=cu121
+            CACHEBUST=${{ github.sha }}
 
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
@@ -70,13 +74,15 @@ jobs:
       - name: Debug - Display Docker build output
         if: failure()
         run: |
-          docker build -f Dockerfile.local . 2>&1 | tee build_output.log
+          mkdir -p logs
+          docker buildx build --progress=plain -f Dockerfile.local . 2>&1 | tee logs/build_output.log
           echo "Last 1000 lines of build output:"
-          tail -n 1000 build_output.log
+          tail -n 1000 logs/build_output.log
 
       - name: Upload build log as artifact
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: docker-build-log
-          path: build_output.log
+          path: logs/build_output.log
+          retention-days: 5

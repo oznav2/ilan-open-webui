@@ -162,9 +162,6 @@ ENV PATH="/usr/bin:${PATH}" \
 # Verify git installation
 RUN git --version
 
-# Create cache directories
-RUN mkdir -p /app/backend/data/cache/{tiktoken,whisper/models,embedding/models}
-
 # Install Python dependencies
 COPY --chown=$UID:$GID ./backend/requirements.txt ./requirements.txt
 
@@ -173,19 +170,18 @@ RUN set -x && \
     cat requirements.txt && \
     pip3 install --upgrade pip && \
     pip3 --version && \
-    pip3 install uv && \
     if [ "$USE_CUDA" = "true" ]; then \
         echo "Installing CUDA version" && \
-        pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/$USE_CUDA_DOCKER_VER --no-cache-dir && \
-        pip3 install tiktoken --no-cache-dir && \
-        python3 -c "import os; import tiktoken; tiktoken.get_encoding(os.environ['TIKTOKEN_ENCODING_NAME'])" && \
-        uv pip install --system -r requirements.txt --no-cache-dir; \
+        pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/$USE_CUDA_DOCKER_VER --no-cache-dir || exit 1; \
+        pip3 install tiktoken --no-cache-dir || exit 1; \
+        python3 -c "import os; import tiktoken; tiktoken.get_encoding('cl100k_base')" || exit 1; \
+        pip3 install -r requirements.txt --no-cache-dir || exit 1; \
     else \
         echo "Installing CPU version" && \
-        pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu --no-cache-dir && \
-        pip3 install tiktoken --no-cache-dir && \
-        python3 -c "import os; import tiktoken; tiktoken.get_encoding(os.environ['TIKTOKEN_ENCODING_NAME'])" && \
-        uv pip install --system -r requirements.txt --no-cache-dir; \
+        pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu --no-cache-dir || exit 1; \
+        pip3 install tiktoken --no-cache-dir || exit 1; \
+        python3 -c "import os; import tiktoken; tiktoken.get_encoding('cl100k_base')" || exit 1; \
+        pip3 install -r requirements.txt --no-cache-dir || exit 1; \
     fi
 
 # Ensure the data directory exists and has correct permissions

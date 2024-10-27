@@ -46,6 +46,7 @@ services:
       - SENTENCE_TRANSFORMERS_HOME=/app/backend/data/cache/embedding/models
       - TIKTOKEN_CACHE_DIR=/app/backend/data/cache/tiktoken
       - HF_HOME=/app/backend/data/cache/embedding/models
+      - USE_CUDA=true
     env_file: .env
     healthcheck:
       test: curl --silent --fail http://localhost:${PORT:-8080}/health | jq -ne 'input.status == true' || exit 1

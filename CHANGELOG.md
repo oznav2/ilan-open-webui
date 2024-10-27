@@ -7,138 +7,166 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+
 ### נוספה
 
 ## \[0.3.30\] - 2024-09-26
+
+# =======
+
 =======
-=======
-=======
-## [0.3.35] - 2024-10-26
+
+## \[0.3.35\] - 2024-10-26
+
+### 
+
+\#נוסף
+
+* **📁 טיפול חסין בקבצים**: שיפור בטיפול בקלט קבצים עבור צ'אט. אם חילוץ התוכן נכשל או ריק, המשתמשים יקבלו כעת אזהרה ברורה, מה שימנע כשלים שקטים ויבטיח שתמיד תדעו מה קורה עם הקבצים שהועלו.
+* **🌍 תמיכה בשפות חדשות**: הוספת תרגומים להונגרית ועדכון התרגומים לצרפתית, הרחבת נגישות הפלטפורמה לשפות עבור קהל משתמשים גלובלי יותר.
+
+\#תוקן
+
+* **📚 בעיה בטעינת מאגר הידע**: תוקנה באג קריטי שבו מאגר הידע לא נטען, מה שמבטיח גישה חלקה למסמכים השמורים ומשפר את אחזור המידע בתהליכי RAG משופרים.
+* **🛠️ בעיה בפרמטרים של כלים**: תוקנה שגיאה שבה הכלים לא פעלו כראוי כשחסרו פרמטרים נדרשים, מה שמבטיח ביצועי כלים אמינים והשלמת משימות יעילה יותר.
+* **🔗 אובדן תגובות ממוזגות בצ'אטים מרובי מודלים**: טופלה בעיה שבה תגובות בתהליכי צ'אט מרובי מודלים נמחקו לאחר שאילתות המשך, שיפור העקביות והבטחת אינטראקציות חלקות יותר בין מודלים.
+
+
+\#\[0.3.34\] - 2024-10-26
+
+\#נוסף
+
+* **🔧 שיפורים ביצוא משוב**: ניתן כעת לייצא היסטוריית משוב ל-JSON, מה שמאפשר אינטגרציה חלקה בעיבוד RLHF וניתוח נוסף.
+* **🗂️ טעינה עצלה של מודל הטמעה**: פונקציונליות החיפוש עבור דירוג מחדש של לוח המובילים יעילה יותר כעת, כאשר מודלי ההטמעה נטענים באופן עצל רק כשנדרש, מה שמייעל את הביצועים.
+* **🎨 מתג קלט טקסט עשיר**: משתמשים יכולים כעת לעבור חזרה לקלט textarea מדור קודם עבור צ'אט אם הם מעדיפים קלט טקסט פשוט יותר, למרות שטקסט עשיר נשאר ברירת המחדל עד להסרה.
+* **🛠️ מנגנון קריאה משופר לכלים**: שיטה משופרת לניתוח וקריאה לכלים, משפרת את האמינות והחוסן של קריאות פונקציות כלים.
+* **🌐 שיפורי גלובליזציה**: עדכונים לתמיכה בבינלאומיות (i18n), המשך שיפור התאימות והדיוק בריבוי שפות.
+
+\#תוקן
+
+* **🖥️ תיקון שינוי שם תיקייה ב-Firefox**: טופלה בעיה מתמשכת שבה משתמשים לא יכלו לשנות שמות תיקיות על ידי לחיצה על enter ב-Firefox, כעת מבטיח ניהול תיקיות חלק בכל הדפדפנים.
+* **🔠 בעיה במפצל טקסט Tiktoken**: נפתרה בעיה שבה מפצל הטקסט tiktoken לא עבד בהתקנות Docker, שחזור פונקציונליות מלאה לעריכת טקסט מטוקן.
+* **💼 בעיית העלאת קבצים ל-S3**: תוקנה בעיה שהשפיעה על העלאות קבצים ל-S3, הבטחת פעולות חלקות עבור אלה שמאחסנים קבצים באחסון ענן.
+* **🔒 קריסת Strict-Transport-Security**: נפתרה קריסה בעת הגדרת כותרת Strict-Transport-Security (HSTS), שיפור היציבות ושיפורי אבטחה.
+* **🚫 תיקון גישה בוליאנית OIDC**: טופלה בעיה עם ערכים בוליאניים שלא נגישים כראוי במהלך התחברויות OIDC, הבטחת אמינות התחברות.
+* **⚙️ התנהגות הדבקה בטקסט עשיר**: שופרה התנהגות ההדבקה בקלט טקסט עשיר כדי להפוך אותה לחלקה ואינטואיטיבית יותר בעת הדבקת סוגי תוכן שונים.
+* **🔨 תיקון להחרגת מודלים בזירה**: תוקנה פונקציית הסינון שלא החריגה כראוי מודלים מהזירה, שיפור ניהול המודלים.
+* **🏷️ תיקון "פרומפט יצירת תגיות"**: טופלה בעיה שמנעה מפרומפטים מותאמים אישית ליצירת תגיות להירשם כראוי, הבטחה שפרומפטים מותאמים אישית עובדים באופן חלק.
+
+  \
+
+\#\[0.3.33\] - 2024-10-24
+
+### #נוסף
+
+**🏆 לוח מובילים להערכה**: עקבו אחר הביצועים שלכם בקלות דרך מערכת לוח מובילים חדשה שבה הדירוגים שלכם תורמים לדירוג בזמן אמת המבוסס על שיטת Elo. תגובות אחיות (יצירה מחדש, צ'אטים מרובי מודלים) נדרשות כדי שהדירוגים שלכם ייספרו בלוח המובילים. בנוסף, תוכלו לבחור לשתף את היסטוריית המשוב שלכם ולהיות חלק מלוח המובילים הקהילתי. צפו לשיפורים נוספים ככל שנשפר את האלגוריתם - עזרו לנו לבנות את לוח המובילים הקהילתי הטוב ביותר!
+
+**⚔️ הערכת מודלים בזירה**: אפשרו בדיקת A/B עיוורת של מודלים ישירות מהגדרות מנהל > הערכה להשוואה אמיתית זה לצד זה. אידיאלי לזיהוי המודל הטוב ביותר עבור הצרכים שלכם.
+
+**🎯 לוח מובילים מבוסס נושאים**: גלו דירוגים מדויקים יותר עם דירוג מחדש ניסיוני מבוסס נושאים, המתאים את מיקומי לוח המובילים בהתבסס על דמיון תגיות במשוב. קבלו תובנות רלוונטיות יותר בהתבסס על נושאים ספציפיים!
+
+**📁 תמיכה בתיקיות לצ'אטים**: ארגנו את הצ'אטים שלכם טוב יותר על ידי קיבוצם לתיקיות. גררו והשמיטו צ'אטים בין תיקיות וייצאו אותם בצורה חלקה לשיתוף או ניתוח קלים!
+
+**📤 ייבוא צ'אט קל באמצעות גרירה ושחרור**: חסכו זמן על ידי גרירה ושחרור פשוטה של ייצוא צ'אטים (JSON) ישירות לסרגל הצד כדי לייבא אותם לסביבת העבודה שלכם - מבוצע, יעיל ואינטואיטיבי!
+
+**📚 אוסף ידע משופר**: כעת תוכלו להתייחס לקבצים בודדים מאוסף ידע - אידיאלי לשאילתות RAG מדויקות יותר וניתוח מסמכים.
+
+**🏷️ מערכת תיוג משופרת**: תגיות תופסות פחות מקום כעת! השתמשו במערכת השאילתות החדשה 'tag:' כדי לנהל, לחפש ולארגן את השיחות שלכם ביעילות רבה יותר מבלי לעמוס את הממשק.
+
+**🧠 תיוג אוטומטי לצ'אטים**: השיחות שלכם מתויגות כעת באופן אוטומטי לארגון משופר, בדומה ליעילות של כותרות שנוצרות אוטומטית.
+
+**🔍 מערכת שאילתות צ'אט בצד השרת**: סינון צ'אטים הפך יעיל יותר, כעת מטופל דרך הצד האחורי\*\* במקום הדפדפן שלכם, משפר את ביצועי החיפוש והדיוק.
+
+**🎮 גרסה חדשה של Playground**: חוו Playground מרענן ומותאם לבדיקה חלקה יותר, כיוונונים וניסויים של המודלים והכלים שלכם.
+
+**🧩 מפצל טקסט מבוסס טוקנים**: השקת פיצול טקסט מבוסס טוקנים (tiktoken), המעניק לכם שליטה מדויקת יותר על אופן עיבוד הטקסט. בעבר, היה זמין רק פיצול מבוסס תווים.
+
+**🔢 הטמעות אצווה של Ollama**: נצלו תמיכה חדשה בהטמעת אצווה לשיפור היעילות והביצועים עם מודלי הטמעה של Ollama.
+
+**🔍 מודל משופר להוספת תוכן טקסט**: תיהנו מזרימת עבודה נקייה ואינטואיטיבית יותר להוספת ואוצרות תוכן ידע עם מודל קלט משודרג מסביבת העבודה Knowledge שלנו.
+
+**🖋️ קלט טקסט עשיר לצ'אטים**: הפכו את קלטי הצ'אט שלכם לדינמיים יותר עם תמיכה בעיצוב טקסט עשיר. השיחות שלכם הפכו הרבה יותר מלוטשות ומקצועיות.
+
+**⚡ יכולת הגדרה של מודל Whisper מהיר**: התאימו אישית את מודל הוויספר המקומי המהיר שלכם ישירות מממשק הווב.
+
+**☁️ תמיכה ניסיונית ב-S3**: אפשרו מופעי WebUI ללא מצב עם תמיכת S3, משפר משמעותית את הסקילביליות ואיזון עומסי עבודה כבדים.
+
+**🔕 השבתת התראות עדכון**: כעת תוכלו לייעל את סביבת העבודה שלכם עוד יותר - בחרו להשבית התראות עדכון לחוויה ממוקדת יותר.
+
+**🌟 אחוז רלוונטיות ציטוטי RAG**: העריכו בקלות את דיוק הציטוטים עם תוספת אחוזי רלוונטיות בתוצאות RAG.
+
+**⚙️ כפתור העתקה ל-Mermaid**: תרשימי Mermaid מגיעים כעת עם כפתור העתקה שימושי, המפשט את חילוץ והשימוש בתוכן התרשימים ישירות בזרימת העבודה שלכם.
+
+**🎨 עיצוב מחדש של הממשק**: עיצוב מחדש משמעותי של הממשק שיהפוך את הניווט לחלק יותר, ישמור את המיקוד שלכם במקום שחשוב, ויבטיח מראה מודרני.
+
+\#תוקן
+
+**🎙️ בעיית עצירת מיקרופון בהקלטת קול**: תוקנה הבעיה שבה המיקרופון נשאר פעיל לאחר סיום הקלטת הערת קול, מבטיח שזרימת העבודה האודיו שלכם פועלת בצורה חלקה.
+
+\#הוסר
+
+**👋 להתראות תגיות בסרגל הצד**: בלגן תגיות בסרגל הצד נעלם. העברנו את כפתורי התגיות לסינון תגיות מבוסס שאילתות יעיל יותר לממשק רזה וזריז יותר.
+
+> > > > > > > main
+
+## \[0.3.32\] - 2024-10-06
 
 ### Added
 
-- **📁 Robust File Handling**: Enhanced file input handling for chat. If the content extraction fails or is empty, users will now receive a clear warning, preventing silent failures and ensuring you always know what's happening with your uploads.
-- **🌍 New Language Support**: Introduced Hungarian translations and updated French translations, expanding the platform's language accessibility for a more global user base.
+* **🔢 Workspace Enhancements**: Added a display count for models, prompts, tools, and functions in the workspace, providing a clear overview and easier management.
 
 ### Fixed
 
-- **📚 Knowledge Base Loading Issue**: Resolved a critical bug where the Knowledge Base was not loading, ensuring smooth access to your stored documents and improving information retrieval in RAG-enhanced workflows.
-- **🛠️ Tool Parameters Issue**: Fixed an error where tools were not functioning correctly when required parameters were missing, ensuring reliable tool performance and more efficient task completions.
-- **🔗 Merged Response Loss in Multi-Model Chats**: Addressed an issue where responses in multi-model chat workflows were being deleted after follow-up queries, improving consistency and ensuring smoother interactions across models.
-
->>>>>>> main
-## [0.3.34] - 2024-10-26
-
-### Added
-
-- **🔧 Feedback Export Enhancements**: Feedback history data can now be exported to JSON, allowing for seamless integration in RLHF processing and further analysis.
-- **🗂️ Embedding Model Lazy Loading**: Search functionality for leaderboard reranking is now more efficient, as embedding models are lazy-loaded only when needed, optimizing performance.
-- **🎨 Rich Text Input Toggle**: Users can now switch back to legacy textarea input for chat if they prefer simpler text input, though rich text is still the default until deprecation.
-- **🛠️ Improved Tool Calling Mechanism**: Enhanced method for parsing and calling tools, improving the reliability and robustness of tool function calls.
-- **🌐 Globalization Enhancements**: Updates to internationalization (i18n) support, further refining multi-language compatibility and accuracy.
-
-### Fixed
-
-- **🖥️ Folder Rename Fix for Firefox**: Addressed a persistent issue where users could not rename folders by pressing enter in Firefox, now ensuring seamless folder management across browsers.
-- **🔠 Tiktoken Model Text Splitter Issue**: Resolved an issue where the tiktoken text splitter wasn’t working in Docker installations, restoring full functionality for tokenized text editing.
-- **💼 S3 File Upload Issue**: Fixed a problem affecting S3 file uploads, ensuring smooth operations for those who store files on cloud storage.
-- **🔒 Strict-Transport-Security Crash**: Resolved a crash when setting the Strict-Transport-Security (HSTS) header, improving stability and security enhancements.
-- **🚫 OIDC Boolean Access Fix**: Addressed an issue with boolean values not being accessed correctly during OIDC logins, ensuring login reliability.
-- **⚙️ Rich Text Paste Behavior**: Refined paste behavior in rich text input to make it smoother and more intuitive when pasting various content types.
-- **🔨 Model Exclusion for Arena Fix**: Corrected the filter function that was not properly excluding models from the arena, improving model management.
-- **🏷️ "Tags Generation Prompt" Fix**: Addressed an issue preventing custom "tags generation prompts" from registering properly, ensuring custom prompt work seamlessly.
-
-## [0.3.33] - 2024-10-24
-
-### Added
-
-- **🏆 Evaluation Leaderboard**: Easily track your performance through a new leaderboard system where your ratings contribute to a real-time ranking based on the Elo system. Sibling responses (regenerations, many model chats) are required for your ratings to count in the leaderboard. Additionally, you can opt-in to share your feedback history and be part of the community-wide leaderboard. Expect further improvements as we refine the algorithm—help us build the best community leaderboard!
-- **⚔️ Arena Model Evaluation**: Enable blind A/B testing of models directly from Admin Settings > Evaluation for a true side-by-side comparison. Ideal for pinpointing the best model for your needs.
-- **🎯 Topic-Based Leaderboard**: Discover more accurate rankings with experimental topic-based reranking, which adjusts leaderboard standings based on tag similarity in feedback. Get more relevant insights based on specific topics!
-- **📁 Folders Support for Chats**: Organize your chats better by grouping them into folders. Drag and drop chats between folders and export them seamlessly for easy sharing or analysis.
-- **📤 Easy Chat Import via Drag & Drop**: Save time by simply dragging and dropping chat exports (JSON) directly onto the sidebar to import them into your workspace—streamlined, efficient, and intuitive!
-- **📚 Enhanced Knowledge Collection**: Now, you can reference individual files from a knowledge collection—ideal for more precise Retrieval-Augmented Generations (RAG) queries and document analysis.
-- **🏷️ Enhanced Tagging System**: Tags now take up less space! Utilize the new 'tag:' query system to manage, search, and organize your conversations more effectively without cluttering the interface.
-- **🧠 Auto-Tagging for Chats**: Your conversations are now automatically tagged for improved organization, mirroring the efficiency of auto-generated titles.
-- **🔍 Backend Chat Query System**: Chat filtering has become more efficient, now handled through the backend\*\* instead of your browser, improving search performance and accuracy.
-- **🎮 Revamped Playground**: Experience a refreshed and optimized Playground for smoother testing, tweaks, and experimentation of your models and tools.
-- **🧩 Token-Based Text Splitter**: Introducing token-based text splitting (tiktoken), giving you more precise control over how text is processed. Previously, only character-based splitting was available.
-- **🔢 Ollama Batch Embeddings**: Leverage new batch embedding support for improved efficiency and performance with Ollama embedding models.
-- **🔍 Enhanced Add Text Content Modal**: Enjoy a cleaner, more intuitive workflow for adding and curating knowledge content with an upgraded input modal from our Knowledge workspace.
-- **🖋️ Rich Text Input for Chats**: Make your chat inputs more dynamic with support for rich text formatting. Your conversations just got a lot more polished and professional.
-- **⚡ Faster Whisper Model Configurability**: Customize your local faster whisper model directly from the WebUI.
-- **☁️ Experimental S3 Support**: Enable stateless WebUI instances with S3 support, greatly enhancing scalability and balancing heavy workloads.
-- **🔕 Disable Update Toast**: Now you can streamline your workspace even further—choose to disable update notifications for a more focused experience.
-- **🌟 RAG Citation Relevance Percentage**: Easily assess citation accuracy with the addition of relevance percentages in RAG results.
-- **⚙️ Mermaid Copy Button**: Mermaid diagrams now come with a handy copy button, simplifying the extraction and use of diagram contents directly in your workflow.
-- **🎨 UI Redesign**: Major interface redesign that will make navigation smoother, keep your focus where it matters, and ensure a modern look.
-
-### Fixed
-
-- **🎙️ Voice Note Mic Stopping Issue**: Fixed the issue where the microphone stayed active after ending a voice note recording, ensuring your audio workflow runs smoothly.
-
-### Removed
-
-- **👋 Goodbye Sidebar Tags**: Sidebar tag clutter is gone. We’ve shifted tag buttons to more effective query-based tag filtering for a sleeker, more agile interface.
-
->>>>>>> main
-## [0.3.32] - 2024-10-06
-
-### Added
-
-- **🔢 Workspace Enhancements**: Added a display count for models, prompts, tools, and functions in the workspace, providing a clear overview and easier management.
-
-### Fixed
-
-- **🖥️ Web and YouTube Attachment Fix**: Resolved an issue where attaching web links and YouTube videos was malfunctioning, ensuring seamless integration and display within chats.
-- **📞 Call Mode Activation on Landing Page**: Fixed a bug where call mode was not operational from the landing page.
+* **🖥️ Web and YouTube Attachment Fix**: Resolved an issue where attaching web links and YouTube videos was malfunctioning, ensuring seamless integration and display within chats.
+* **📞 Call Mode Activation on Landing Page**: Fixed a bug where call mode was not operational from the landing page.
 
 ### Changed
 
-- **🔄 URL Parameter Refinement**: Updated the 'tool_ids' URL parameter to 'tools' or 'tool-ids' for more intuitive and consistent user experience.
-- **🎨 Floating Buttons Styling Update**: Refactored the styling of floating buttons to intelligently adjust to the left side when there isn't enough room on the right, improving interface usability and aesthetic.
-- **🔧 Enhanced Accessibility for Floating Buttons**: Implemented the ability to close floating buttons with the 'Esc' key, making workflow smoother and more efficient for users navigating via keyboard.
-- **🖇️ Updated Information URL**: Information URLs now direct users to a general release page rather than a version-specific URL, ensuring access to the latest and relevant details all in one place.
-- **📦 Library Dependencies Update**: Upgraded dependencies to ensure compatibility and performance optimization for pip installs.
+* **🔄 URL Parameter Refinement**: Updated the 'tool_ids' URL parameter to 'tools' or 'tool-ids' for more intuitive and consistent user experience.
+* **🎨 Floating Buttons Styling Update**: Refactored the styling of floating buttons to intelligently adjust to the left side when there isn't enough room on the right, improving interface usability and aesthetic.
+* **🔧 Enhanced Accessibility for Floating Buttons**: Implemented the ability to close floating buttons with the 'Esc' key, making workflow smoother and more efficient for users navigating via keyboard.
+* **🖇️ Updated Information URL**: Information URLs now direct users to a general release page rather than a version-specific URL, ensuring access to the latest and relevant details all in one place.
+* **📦 Library Dependencies Update**: Upgraded dependencies to ensure compatibility and performance optimization for pip installs.
 
-## [0.3.31] - 2024-10-06
+## \[0.3.31\] - 2024-10-06
 
 ### Added
 
-- **📚 Knowledge Feature**: Reimagined documents feature, now more performant with a better UI for enhanced organization; includes streamlined API integration for Retrieval-Augmented Generation (RAG). Detailed documentation forthcoming: https://docs.openwebui.com/
-- **🌐 New Landing Page**: Freshly designed landing page; toggle between the new UI and the classic chat UI from Settings > Interface for a personalized experience.
-- **📁 Full Document Retrieval Mode**: Toggle between full document retrieval or traditional snippets by clicking on the file item. This mode enhances document capabilities and supports comprehensive tasks like summarization by utilizing the entire content instead of RAG.
-- **📄 Extracted File Content Display**: View extracted content directly by clicking on the file item, simplifying file analysis.
-- **🎨 Artifacts Feature**: Render web content and SVGs directly in the interface, supporting quick iterations and live changes.
-- **🖊️ Editable Code Blocks**: Supercharged code blocks now allow live editing directly in the LLM response, with live reloads supported by artifacts.
-- **🔧 Code Block Enhancements**: Introduced a floating copy button in code blocks to facilitate easier code copying without scrolling.
-- **🔍 SVG Pan/Zoom**: Enhanced interaction with SVG images, including Mermaid diagrams, via new pan and zoom capabilities.
-- **🔍 Text Select Quick Actions**: New floating buttons appear when text is highlighted in LLM responses, offering deeper interactions like "Ask a Question" or "Explain".
-- **🗃️ Database Pool Configuration**: Enhanced database handling to support scalable user growth.
-- **🔊 Experimental Audio Compression**: Compress audio files to navigate around the 25MB limit for OpenAI's speech-to-text processing.
-- **🔍 Query Embedding**: Adjusted embedding behavior to enhance system performance by not repeating query embedding.
-- **💾 Lazy Load Optimizations**: Implemented lazy loading of large dependencies to minimize initial memory usage, boosting performance.
-- **🍏 Apple Touch Icon Support**: Optimizes the display of icons for web bookmarks on Apple mobile devices.
-- **🔽 Expandable Content Markdown Support**: Introducing 'details', 'summary' tag support for creating expandable content sections in markdown, facilitating cleaner, organized documentation and interactive content display.
+* **📚 Knowledge Feature**: Reimagined documents feature, now more performant with a better UI for enhanced organization; includes streamlined API integration for Retrieval-Augmented Generation (RAG). Detailed documentation forthcoming: https://docs.openwebui.com/
+* **🌐 New Landing Page**: Freshly designed landing page; toggle between the new UI and the classic chat UI from Settings > Interface for a personalized experience.
+* **📁 Full Document Retrieval Mode**: Toggle between full document retrieval or traditional snippets by clicking on the file item. This mode enhances document capabilities and supports comprehensive tasks like summarization by utilizing the entire content instead of RAG.
+* **📄 Extracted File Content Display**: View extracted content directly by clicking on the file item, simplifying file analysis.
+* **🎨 Artifacts Feature**: Render web content and SVGs directly in the interface, supporting quick iterations and live changes.
+* **🖊️ Editable Code Blocks**: Supercharged code blocks now allow live editing directly in the LLM response, with live reloads supported by artifacts.
+* **🔧 Code Block Enhancements**: Introduced a floating copy button in code blocks to facilitate easier code copying without scrolling.
+* **🔍 SVG Pan/Zoom**: Enhanced interaction with SVG images, including Mermaid diagrams, via new pan and zoom capabilities.
+* **🔍 Text Select Quick Actions**: New floating buttons appear when text is highlighted in LLM responses, offering deeper interactions like "Ask a Question" or "Explain".
+* **🗃️ Database Pool Configuration**: Enhanced database handling to support scalable user growth.
+* **🔊 Experimental Audio Compression**: Compress audio files to navigate around the 25MB limit for OpenAI's speech-to-text processing.
+* **🔍 Query Embedding**: Adjusted embedding behavior to enhance system performance by not repeating query embedding.
+* **💾 Lazy Load Optimizations**: Implemented lazy loading of large dependencies to minimize initial memory usage, boosting performance.
+* **🍏 Apple Touch Icon Support**: Optimizes the display of icons for web bookmarks on Apple mobile devices.
+* **🔽 Expandable Content Markdown Support**: Introducing 'details', 'summary' tag support for creating expandable content sections in markdown, facilitating cleaner, organized documentation and interactive content display.
 
 ### Fixed
 
-- **🔘 Action Button Issue**: Resolved a bug where action buttons were not functioning, enhancing UI reliability.
-- **🔄 Multi-Model Chat Loop**: Fixed an infinite loop issue in multi-model chat environments, ensuring smoother chat operations.
-- **📄 Chat PDF/TXT Export Issue**: Resolved problems with exporting chat logs to PDF and TXT formats.
-- **🔊 Call to Text-to-Speech Issues**: Rectified problems with text-to-speech functions to improve audio interactions.
+* **🔘 Action Button Issue**: Resolved a bug where action buttons were not functioning, enhancing UI reliability.
+* **🔄 Multi-Model Chat Loop**: Fixed an infinite loop issue in multi-model chat environments, ensuring smoother chat operations.
+* **📄 Chat PDF/TXT Export Issue**: Resolved problems with exporting chat logs to PDF and TXT formats.
+* **🔊 Call to Text-to-Speech Issues**: Rectified problems with text-to-speech functions to improve audio interactions.
 
 ### Changed
 
-- **⚙️ Endpoint Renaming**: Renamed 'rag' endpoints to 'retrieval' for clearer function description.
-- **🎨 Styling and Interface Updates**: Multiple refinements across the platform to enhance visual appeal and user interaction.
+* **⚙️ Endpoint Renaming**: Renamed 'rag' endpoints to 'retrieval' for clearer function description.
+* **🎨 Styling and Interface Updates**: Multiple refinements across the platform to enhance visual appeal and user interaction.
 
 ### Removed
 
-- **🗑️ Deprecated 'DOCS_DIR'**: Removed the outdated 'docs_dir' variable in favor of more direct file management solutions, with direct file directory syncing and API uploads for a more integrated experience.
+* **🗑️ Deprecated 'DOCS_DIR'**: Removed the outdated 'docs_dir' variable in favor of more direct file management solutions, with direct file directory syncing and API uploads for a more integrated experience.
 
-## [0.3.30] - 2024-09-26
->>>>>>> main
+## \[0.3.30\] - 2024-09-26
+
+> > > > > > > main
 
 ### Fixed
 
@@ -1261,4 +1289,4 @@
 
 * Instead of having the previous 1.0.0-alpha.101, we switched to semantic versioning as a way to respect global conventions.
 
-git 
+git

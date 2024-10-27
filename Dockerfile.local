@@ -15,7 +15,7 @@ ARG GID=0
 ARG USE_TIKTOKEN_ENCODING_NAME="cl100k_base"
 
 ######## WebUI frontend ########
-FROM --platform=$BUILDPLATFORM node:21-alpine3.19 as build
+FROM --platform=$BUILDPLATFORM node:22-alpine3.20 AS build
 ARG BUILD_HASH
 
 WORKDIR /app
@@ -165,7 +165,6 @@ ENV PATH="/usr/bin:${PATH}" \
 
 # Verify git installation
 RUN git --version
-
 # Install Python dependencies
 COPY --chown=$UID:$GID ./backend/requirements.txt ./requirements.txt
 
@@ -173,26 +172,77 @@ RUN echo "Contents of requirements.txt:" && \
     cat requirements.txt && \
     pip3 install --upgrade pip && \
     pip3 --version && \
-    pip3 install uv && \
+    # Install essential build dependencies
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
+        python3-dev \
+        build-essential \
+        gcc \
+        libc6-dev && \
+    # Install pip packages with explicit commands to ensure proper installation
+    pip3 install --no-cache-dir \
+        setuptools \
+        wheel \
+        uv && \
     if [ "$USE_CUDA" = "true" ]; then \
         echo "Installing CUDA version" && \
-        pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/$USE_CUDA_DOCKER_VER --no-cache-dir && \
-        uv pip install --system -r requirements.txt --no-cache-dir; \
-        python -c "import os; from sentence_transformers import SentenceTransformer; SentenceTransformer(os.environ['RAG_EMBEDDING_MODEL'], device='cpu')" && \
-        python -c "import os; from faster_whisper import WhisperModel; WhisperModel(os.environ['WHISPER_MODEL'], device='cpu', compute_type='int8', download_root=os.environ['WHISPER_MODEL_DIR'])"; \
-        python -c "import os; import tiktoken; tiktoken.get_encoding(os.environ['TIKTOKEN_ENCODING_NAME'])"; \
+        pip3 install --no-cache-dir torch torchvision torchaudio --index-url https://download.pytorch.org/whl/$USE_CUDA_DOCKER_VER && \
+        # Install sentence-transformers and its dependencies explicitly
+        pip3 install --no-cache-dir \
+            numpy \
+            scipy \
+            scikit-learn \
+            nltk \
+            transformers \
+            sentencepiece \
+            sentence-transformers==3.2.0 && \
+        # Install other requirements
+        uv pip install --system -r requirements.txt --no-cache-dir && \
+        # Verify critical packages
+        python -c "import torch; print('PyTorch version:', torch.__version__)" && \
+        python -c "import sentence_transformers; print('sentence-transformers version:', sentence_transformers.__version__)" && \
+        python -c "import tiktoken; print('tiktoken version:', tiktoken.__version__)" && \
+        # Load and verify models
+        python -c "import os; from sentence_transformers import SentenceTransformer; print('Loading model:', os.environ.get('RAG_EMBEDDING_MODEL', 'default')); model = SentenceTransformer(os.environ.get('RAG_EMBEDDING_MODEL', 'all-MiniLM-L6-v2'), device='cpu'); print('Model loaded successfully')" && \
+        python -c "import os; from faster_whisper import WhisperModel; print('Loading Whisper model:', os.environ.get('WHISPER_MODEL', 'default')); model = WhisperModel(os.environ.get('WHISPER_MODEL', 'tiny'), device='cpu', compute_type='int8', download_root=os.environ.get('WHISPER_MODEL_DIR', '/tmp/whisper')); print('Whisper model loaded successfully')" && \
+        python -c "import os; import tiktoken; print('Loading tokenizer:', os.environ.get('TIKTOKEN_ENCODING_NAME', 'cl100k_base')); enc = tiktoken.get_encoding(os.environ.get('TIKTOKEN_ENCODING_NAME', 'cl100k_base')); print('Tokenizer loaded successfully')"; \
     else \
         echo "Installing CPU version" && \
-        pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu --no-cache-dir && \
-        uv pip install --system -r requirements.txt --no-cache-dir; \
-        python -c "import os; from sentence_transformers import SentenceTransformer; SentenceTransformer(os.environ['RAG_EMBEDDING_MODEL'], device='cpu')" && \
-        python -c "import os; from faster_whisper import WhisperModel; WhisperModel(os.environ['WHISPER_MODEL'], device='cpu', compute_type='int8', download_root=os.environ['WHISPER_MODEL_DIR'])"; \
-        python -c "import os; import tiktoken; tiktoken.get_encoding(os.environ['TIKTOKEN_ENCODING_NAME'])"; \
+        pip3 install --no-cache-dir torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu && \
+        # Install sentence-transformers and its dependencies explicitly
+        pip3 install --no-cache-dir \
+            numpy \
+            scipy \
+            scikit-learn \
+            nltk \
+            transformers \
+            sentencepiece \
+            sentence-transformers==3.2.0 && \
+        # Install other requirements
+        uv pip install --system -r requirements.txt --no-cache-dir && \
+        # Verify critical packages
+        python -c "import torch; print('PyTorch version:', torch.__version__)" && \
+        python -c "import sentence_transformers; print('sentence-transformers version:', sentence_transformers.__version__)" && \
+        python -c "import tiktoken; print('tiktoken version:', tiktoken.__version__)" && \
+        # Load and verify models
+        python -c "import os; from sentence_transformers import SentenceTransformer; print('Loading model:', os.environ.get('RAG_EMBEDDING_MODEL', 'default')); model = SentenceTransformer(os.environ.get('RAG_EMBEDDING_MODEL', 'all-MiniLM-L6-v2'), device='cpu'); print('Model loaded successfully')" && \
+        python -c "import os; from faster_whisper import WhisperModel; print('Loading Whisper model:', os.environ.get('WHISPER_MODEL', 'default')); model = WhisperModel(os.environ.get('WHISPER_MODEL', 'tiny'), device='cpu', compute_type='int8', download_root=os.environ.get('WHISPER_MODEL_DIR', '/tmp/whisper')); print('Whisper model loaded successfully')" && \
+        python -c "import os; import tiktoken; print('Loading tokenizer:', os.environ.get('TIKTOKEN_ENCODING_NAME', 'cl100k_base')); enc = tiktoken.get_encoding(os.environ.get('TIKTOKEN_ENCODING_NAME', 'cl100k_base')); print('Tokenizer loaded successfully')"; \
     fi && \
+    # Clean up
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* && \
+    # Set permissions
     chown -R $UID:$GID /app/backend/data/
 
 # Ensure the data directory exists and has correct permissions
 RUN mkdir -p /app/backend/data && chown -R $UID:$GID /app/backend/data
+
+# Create cache directories with proper permissions
+RUN mkdir -p /app/backend/data/cache/embedding/models && \
+    mkdir -p /app/backend/data/cache/whisper/models && \
+    mkdir -p /app/backend/data/cache/tiktoken && \
+    chown -R $UID:$GID /app/backend/data/cache
 
 # Copy built frontend files
 COPY --chown=$UID:$GID --from=build /app/build /app/build

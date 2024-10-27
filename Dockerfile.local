@@ -72,6 +72,10 @@ ENV ENV=prod \
     PATH="/usr/bin:${PATH}" \
     TIKTOKEN_ENCODING_NAME=${USE_TIKTOKEN_ENCODING_NAME}
 
+    
+## Tiktoken cache dir  ##
+ENV TIKTOKEN_CACHE_DIR="/app/backend/data/cache/tiktoken"
+
 # Add your custom environment variables here
 ENV GROQ_API_BASE_URL="https://api.groq.com/openai/v1" \
     GROQ_API_KEY="" \
@@ -170,19 +174,22 @@ RUN set -x && \
     cat requirements.txt && \
     pip3 install --upgrade pip && \
     pip3 --version && \
+    pip3 install uv && \
     if [ "$USE_CUDA" = "true" ]; then \
-        echo "Installing CUDA version" && \
-        pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/$USE_CUDA_DOCKER_VER --no-cache-dir || exit 1; \
-        pip3 install tiktoken --no-cache-dir || exit 1; \
-        python3 -c "import os; import tiktoken; tiktoken.get_encoding('cl100k_base')" || exit 1; \
-        pip3 install -r requirements.txt --no-cache-dir || exit 1; \
+    # If you use CUDA the whisper and embedding model will be downloaded on first use
+    pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/$USE_CUDA_DOCKER_VER --no-cache-dir && \
+    uv pip3 install --system -r requirements.txt --no-cache-dir && \
+    python -c "import os; from sentence_transformers import SentenceTransformer; SentenceTransformer(os.environ['RAG_EMBEDDING_MODEL'], device='cpu')" && \
+    python -c "import os; from faster_whisper import WhisperModel; WhisperModel(os.environ['WHISPER_MODEL'], device='cpu', compute_type='int8', download_root=os.environ['WHISPER_MODEL_DIR'])"; \
+    python -c "import os; import tiktoken; tiktoken.get_encoding(os.environ['TIKTOKEN_ENCODING_NAME'])"; \
     else \
-        echo "Installing CPU version" && \
-        pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu --no-cache-dir || exit 1; \
-        pip3 install tiktoken --no-cache-dir || exit 1; \
-        python3 -c "import os; import tiktoken; tiktoken.get_encoding('cl100k_base')" || exit 1; \
-        pip3 install -r requirements.txt --no-cache-dir || exit 1; \
-    fi
+    pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu --no-cache-dir && \
+    uv pip3 install --system -r requirements.txt --no-cache-dir && \
+    python -c "import os; from sentence_transformers import SentenceTransformer; SentenceTransformer(os.environ['RAG_EMBEDDING_MODEL'], device='cpu')" && \
+    python -c "import os; from faster_whisper import WhisperModel; WhisperModel(os.environ['WHISPER_MODEL'], device='cpu', compute_type='int8', download_root=os.environ['WHISPER_MODEL_DIR'])"; \
+    python -c "import os; import tiktoken; tiktoken.get_encoding(os.environ['TIKTOKEN_ENCODING_NAME'])"; \
+    fi; \
+    chown -R $UID:$GID /app/backend/data/
 
 # Ensure the data directory exists and has correct permissions
 RUN mkdir -p /app/backend/data && chown -R $UID:$GID /app/backend/data

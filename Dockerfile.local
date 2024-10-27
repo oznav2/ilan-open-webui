@@ -174,35 +174,35 @@ RUN git --version
 # Install Python dependencies
 COPY --chown=$UID:$GID ./backend/requirements.txt ./requirements.txt
 
-RUN echo "=========STARTING PYTHON DEPENDECIES INSTALLATION========" && \
+RUN echo "=========STARTING PYTHON DEPENDENCIES INSTALLATION========" && \
+    # Update pip and install basic requirements
     pip3 install --upgrade pip && \
     pip3 --version && \
+    # Install core dependencies
     pip3 install --no-cache-dir \
-        setuptools && \
-        wheel && \
+        setuptools \
+        wheel \
         uv && \
-        tiktoken && \
+    # Install specific ML packages
+    pip3 install --no-cache-dir \
+        tiktoken \
         sentence-transformers==3.2.0 && \
+    # Install PyTorch with CUDA
+    echo "========Installing CUDA version======" && \
+    pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/$USE_CUDA_DOCKER_VER --no-cache-dir && \
+    # Install requirements.txt
     pip3 install -r requirements.txt --no-cache-dir && \
-    if [ "$USE_CUDA" = "true" ]; then \
-        echo "========Installing CUDA version======" && \
-        pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/$USE_CUDA_DOCKER_VER --no-cache-dir || exit 1; \
-        python -c "import os; from sentence_transformers import SentenceTransformer; SentenceTransformer(os.environ['RAG_EMBEDDING_MODEL'], device='cpu')" && \
-        python -c "import os; from faster_whisper import WhisperModel; WhisperModel(os.environ['WHISPER_MODEL'], device='cpu', compute_type='int8', download_root=os.environ['WHISPER_MODEL_DIR'])"; \
-        python -c "import os; import tiktoken; tiktoken.get_encoding(os.environ['TIKTOKEN_ENCODING_NAME'])"; \
-    else \
-        echo "=========Installing CPU version========" && \
-        # pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu --no-cache-dir || exit 1; \
-        # python -c "import os; from sentence_transformers import SentenceTransformer; SentenceTransformer(os.environ['RAG_EMBEDDING_MODEL'], device='cpu')" && \
-        # python -c "import os; from faster_whisper import WhisperModel; WhisperModel(os.environ['WHISPER_MODEL'], device='cpu', compute_type='int8', download_root=os.environ['WHISPER_MODEL_DIR'])"; \
-        # python -c "import os; import tiktoken; tiktoken.get_encoding(os.environ['TIKTOKEN_ENCODING_NAME'])"; \
-    fi \
+    # Verify imports and model loading
+    python -c "import torch; assert torch.cuda.is_available(), 'CUDA not available'" && \
+    python -c "import os; from sentence_transformers import SentenceTransformer; model = SentenceTransformer(os.environ['RAG_EMBEDDING_MODEL'], device='cuda'); print('SentenceTransformer loaded successfully')" && \
+    python -c "import os; from faster_whisper import WhisperModel; model = WhisperModel(os.environ['WHISPER_MODEL'], device='cuda', compute_type='float16', download_root=os.environ['WHISPER_MODEL_DIR']); print('WhisperModel loaded successfully')" && \
+    python -c "import os; import tiktoken; encoding = tiktoken.get_encoding(os.environ['TIKTOKEN_ENCODING_NAME']); print('Tiktoken encoding loaded successfully')" && \
     # Clean up
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
-    rm -rf /var/cache/apt/* \
+    rm -rf /var/cache/apt/* && \
     # Set permissions
-    chown -R $UID:$GID /app/backend/data/
+    chown -R $UID:$GID /app/backend/data
 
 # Ensure the data directory exists and has correct permissions
 RUN mkdir -p /app/backend/data && chown -R $UID:$GID /app/backend/data

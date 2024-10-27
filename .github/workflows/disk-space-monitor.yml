@@ -1,0 +1,25 @@
+name: Disk Space Monitor
+
+on:
+  workflow_call:  # Makes this workflow reusable
+
+jobs:
+  monitor-space:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Monitor Disk Space
+        run: |
+          echo "=== Disk Space Overview ==="
+          df -h
+          
+          echo -e "\n=== Docker Space Usage ==="
+          docker system df
+          
+          echo -e "\n=== Largest Directories ==="
+          sudo du -h -d 2 / 2>/dev/null | sort -rh | head -20
+          
+          echo -e "\n=== Available Space Check ==="
+          available_space=$(df / | awk 'NR==2 {print $4}')
+          if [ $available_space -lt 5000000 ]; then  # Less than 5GB
+            echo "::warning::Low disk space detected: Less than 5GB available"
+          fi

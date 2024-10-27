@@ -1,0 +1,48 @@
+name: Disk Space Cleanup
+
+on:
+  workflow_call:
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pre-cleanup Check
+        run: df -h
+        
+      - name: Comprehensive System Cleanup
+        run: |
+          # Remove unnecessary packages and cache
+          sudo apt-get clean
+          sudo apt-get autoremove -y
+          sudo rm -rf /var/lib/apt/lists/*
+          
+          # Clear system logs
+          sudo find /var/log -type f -exec rm -rf {} \;
+          
+          # Remove unused Docker resources
+          docker system prune -af --volumes
+          
+          # Remove development tools and languages not needed
+          sudo rm -rf /usr/local/lib/android # Android SDK
+          sudo rm -rf /usr/share/dotnet     # .NET Runtime
+          sudo rm -rf /opt/ghc              # Haskell
+          sudo rm -rf /usr/local/share/boost # Boost
+          sudo rm -rf /usr/local/share/rust # Rust
+          sudo rm -rf /usr/local/lib/node*  # Old Node versions
+          sudo rm -rf /opt/hostedtoolcache  # Tool cache
+          
+          # Clear npm and yarn cache
+          npm cache clean --force || true
+          yarn cache clean || true
+          
+          # Remove unused directories
+          sudo rm -rf /tmp/* /var/tmp/*
+          
+          echo "=== Cleanup Complete ==="
+          df -h
+
+      - name: Post-cleanup Check
+        run: |
+          echo "=== Space Recovered ==="
+          df -h

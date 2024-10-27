@@ -1,4 +1,5 @@
 .github
+.git
 .DS_Store
 docs
 kubernetes
@@ -17,3 +18,7 @@ uploads
 .ipynb_checkpoints
 **/*.db
 _test
+*.log
+logs/
+tmp/
+temp/

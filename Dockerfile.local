@@ -22,6 +22,9 @@ WORKDIR /app
 RUN echo "$CACHEBUST"
 
 COPY package.json package-lock.json ./
+# cleaning npm cache
+RUN npm cache clean --force || true
+
 # Increase npm timeout and add retries
 RUN npm config set fetch-retry-maxtimeout 1000000
 RUN npm config set fetch-timeout 1000000
@@ -158,7 +161,9 @@ RUN apt-get update && \
     if [ "$USE_OLLAMA" = "true" ]; then \
     curl -fsSL https://ollama.com/install.sh | sh; \
     fi && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
+    
 
 # Ensure git is in the PATH and set GIT_PYTHON_GIT_EXECUTABLE
 ENV PATH="/usr/bin:${PATH}" \
@@ -169,8 +174,7 @@ RUN git --version
 # Install Python dependencies
 COPY --chown=$UID:$GID ./backend/requirements.txt ./requirements.txt
 
-RUN echo "Contents of requirements.txt:" && \
-    cat requirements.txt && \
+RUN echo "=========STARTING PYTHON DEPENDECIES INSTALLATION========" && \
     pip3 install --upgrade pip && \
     pip3 --version && \
     # Install essential build dependencies
@@ -186,7 +190,7 @@ RUN echo "Contents of requirements.txt:" && \
         wheel \
         uv && \
     if [ "$USE_CUDA" = "true" ]; then \
-        echo "Installing CUDA version" && \
+        echo "========Installing CUDA version======" && \
         pip3 install -r requirements.txt --no-cache-dir && \
         pip3 install --no-cache-dir torch torchvision torchaudio --index-url https://download.pytorch.org/whl/$USE_CUDA_DOCKER_VER && \
         # Install sentence-transformers and its dependencies explicitly
@@ -206,7 +210,7 @@ RUN echo "Contents of requirements.txt:" && \
         python -c "import os; from faster_whisper import WhisperModel; WhisperModel(os.environ['WHISPER_MODEL'], device='cpu', compute_type='int8', download_root=os.environ['WHISPER_MODEL_DIR'])"; \
         python -c "import os; import tiktoken; tiktoken.get_encoding(os.environ['TIKTOKEN_ENCODING_NAME'])"; \
     else \
-        echo "Installing CPU version" && \
+        echo "=========Installing CPU version========" && \
         pip3 install -r requirements.txt --no-cache-dir && \
         pip3 install --no-cache-dir torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu && \
         # Install sentence-transformers and its dependencies explicitly

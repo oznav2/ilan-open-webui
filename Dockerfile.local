@@ -169,12 +169,7 @@ RUN git --version
 # Install Python dependencies
 COPY --chown=$UID:$GID ./backend/requirements.txt ./requirements.txt
 
-RUN set -x && \
-    echo "Contents of requirements.txt:" && \
-    cat requirements.txt && \
-    pip3 install --upgrade pip && \
-    pip3 --version && \
-    pip3 install uv && \
+RUN pip3 install uv && \
     if [ "$USE_CUDA" = "true" ]; then \
     # If you use CUDA the whisper and embedding model will be downloaded on first use
     pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/$USE_CUDA_DOCKER_VER --no-cache-dir && \

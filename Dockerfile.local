@@ -68,7 +68,9 @@ ENV ENV=prod \
     HF_HOME="/app/backend/data/cache/embedding/models" \
     HOME=/root \
     GIT_PYTHON_REFRESH=quiet \
-    PATH="/usr/bin:${PATH}"
+    PATH="/usr/bin:${PATH}" \
+    TIKTOKEN_ENCODING_NAME="cl100k_base" \
+    TIKTOKEN_CACHE_DIR="/app/backend/data/cache/tiktoken"
 
 # Add your custom environment variables here
 ENV GROQ_API_BASE_URL="https://api.groq.com/openai/v1" \
@@ -116,14 +118,6 @@ ENV GROQ_API_BASE_URL="https://api.groq.com/openai/v1" \
     USE_OLLAMA_DOCKER="false" \
     CORS_ALLOW_ORIGIN="*"
 
-    
-## Tiktoken model settings ##
-ENV TIKTOKEN_ENCODING_NAME="cl100k_base" \
-TIKTOKEN_CACHE_DIR="/app/backend/data/cache/tiktoken"
-
-## Hugging Face download cache ##
-ENV HF_HOME="/app/backend/data/cache/embedding/models"
-
 WORKDIR /app/backend
 
 # Create user and group if not root
@@ -168,25 +162,31 @@ ENV PATH="/usr/bin:${PATH}" \
 # Verify git installation
 RUN git --version
 
+# Create necessary directories
+RUN mkdir -p /app/backend/data/cache/{tiktoken,whisper/models,embedding/models}
+
 # Install Python dependencies
 COPY --chown=$UID:$GID ./backend/requirements.txt ./requirements.txt
 
-RUN set -x && \
+# Modified Python dependencies installation
+RUN set -ex && \
     echo "Contents of requirements.txt:" && \
     cat requirements.txt && \
     pip3 install --upgrade pip && \
     pip3 --version && \
+    # Install PyTorch first
     if [ "$USE_CUDA" = "true" ]; then \
         echo "Installing CUDA version" && \
-        pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/$USE_CUDA_DOCKER_VER --no-cache-dir || exit 1; \
-        python -c "import os; import tiktoken; tiktoken.get_encoding(os.environ['TIKTOKEN_ENCODING_NAME'])"; \
-        else \
+        pip3 install --no-cache-dir torch torchvision torchaudio --index-url https://download.pytorch.org/whl/${USE_CUDA_VER}; \
+    else \
         echo "Installing CPU version" && \
-        pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu --no-cache-dir || exit 1; \
-        python -c "import os; import tiktoken; tiktoken.get_encoding(os.environ['TIKTOKEN_ENCODING_NAME'])"; \
+        pip3 install --no-cache-dir torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu; \
     fi && \
-    echo "Installing requirements" && \
-    pip3 install -r requirements.txt --no-cache-dir || exit 1
+    # Install tiktoken separately
+    pip3 install --no-cache-dir tiktoken && \
+    python3 -c "import os; import tiktoken; tiktoken.get_encoding(os.environ['TIKTOKEN_ENCODING_NAME'])" && \
+    # Install remaining requirements
+    pip3 install --no-cache-dir -r requirements.txt
 
 # Ensure the data directory exists and has correct permissions
 RUN mkdir -p /app/backend/data && chown -R $UID:$GID /app/backend/data

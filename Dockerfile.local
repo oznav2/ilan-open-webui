@@ -11,11 +11,11 @@ ARG BUILD_HASH=dev-build
 ARG UID=0
 ARG GID=0
 
-# Tiktoken encoding name; models to use can be found at https://huggingface.co/models?library=tiktoken
+# Add tiktoken encoding name
 ARG USE_TIKTOKEN_ENCODING_NAME="cl100k_base"
 
 ######## WebUI frontend ########
-FROM --platform=$BUILDPLATFORM node:22-alpine3.20 AS build
+FROM --platform=$BUILDPLATFORM node:21-alpine3.19 as build
 ARG BUILD_HASH
 
 WORKDIR /app
@@ -42,7 +42,7 @@ ARG USE_EMBEDDING_MODEL
 ARG USE_RERANKING_MODEL
 ARG UID
 ARG GID
-ARG DEBIAN_FRONTEND=noninteractive
+ARG USE_TIKTOKEN_ENCODING_NAME
 
 # Set environment variables
 ENV ENV=prod \
@@ -70,10 +70,7 @@ ENV ENV=prod \
     HOME=/root \
     GIT_PYTHON_REFRESH=quiet \
     PATH="/usr/bin:${PATH}" \
-    TIKTOKEN_ENCODING_NAME="cl100k_base" \
-    TIKTOKEN_CACHE_DIR="/app/backend/data/cache/tiktoken" \
-    PIP_NO_CACHE_DIR=1 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1
+    TIKTOKEN_ENCODING_NAME=${USE_TIKTOKEN_ENCODING_NAME}
 
 # Add your custom environment variables here
 ENV GROQ_API_BASE_URL="https://api.groq.com/openai/v1" \
@@ -131,8 +128,8 @@ RUN if [ $UID -ne 0 ]; then \
     adduser --uid $UID --gid $GID --home $HOME --disabled-password --no-create-home app; \
     fi
 
-RUN mkdir -p $HOME/.cache/chroma && \
-    echo -n 00000000-0000-0000-0000-000000000000 > $HOME/.cache/chroma/telemetry_user_id
+RUN mkdir -p $HOME/.cache/chroma
+RUN echo -n 00000000-0000-0000-0000-000000000000 > $HOME/.cache/chroma/telemetry_user_id
 
 # Make sure the user has access to the app and root directory
 RUN chown -R $UID:$GID /app $HOME
@@ -152,39 +149,44 @@ RUN apt-get update && \
     ffmpeg \
     libsm6 \
     libxext6 \
-    git \
-    python3-pip \
-    python3-wheel \
-    python3-setuptools && \
-    rm -rf /var/lib/apt/lists/* && \
-    python3 -m pip install --no-cache-dir --upgrade pip setuptools wheel && \
+    git && \
     if [ "$USE_OLLAMA" = "true" ]; then \
     curl -fsSL https://ollama.com/install.sh | sh; \
-    fi
+    fi && \
+    rm -rf /var/lib/apt/lists/*
 
-# Create necessary directories and set permissions
-RUN mkdir -p /app/backend/data/cache/{tiktoken,whisper/models,embedding/models} && \
-    chmod -R 777 /app/backend/data/cache
+# Ensure git is in the PATH and set GIT_PYTHON_GIT_EXECUTABLE
+ENV PATH="/usr/bin:${PATH}" \
+    GIT_PYTHON_GIT_EXECUTABLE=/usr/bin/git
+
+# Verify git installation
+RUN git --version
+
+# Create cache directories
+RUN mkdir -p /app/backend/data/cache/{tiktoken,whisper/models,embedding/models}
 
 # Install Python dependencies
 COPY --chown=$UID:$GID ./backend/requirements.txt ./requirements.txt
 
-# Install PyTorch packages
-RUN pip3 install --no-cache-dir setuptools wheel && \
+RUN set -x && \
+    echo "Contents of requirements.txt:" && \
+    cat requirements.txt && \
+    pip3 install --upgrade pip && \
+    pip3 --version && \
+    pip3 install uv && \
     if [ "$USE_CUDA" = "true" ]; then \
         echo "Installing CUDA version" && \
-        pip3 install --no-cache-dir torch==2.1.0 torchvision==0.16.0 torchaudio==2.1.0 --index-url https://download.pytorch.org/whl/${USE_CUDA_VER}; \
+        pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/$USE_CUDA_DOCKER_VER --no-cache-dir && \
+        pip3 install tiktoken --no-cache-dir && \
+        python3 -c "import os; import tiktoken; tiktoken.get_encoding(os.environ['TIKTOKEN_ENCODING_NAME'])" && \
+        uv pip install --system -r requirements.txt --no-cache-dir; \
     else \
         echo "Installing CPU version" && \
-        pip3 install --no-cache-dir torch==2.1.0 torchvision==0.16.0 torchaudio==2.1.0 --index-url https://download.pytorch.org/whl/cpu; \
+        pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu --no-cache-dir && \
+        pip3 install tiktoken --no-cache-dir && \
+        python3 -c "import os; import tiktoken; tiktoken.get_encoding(os.environ['TIKTOKEN_ENCODING_NAME'])" && \
+        uv pip install --system -r requirements.txt --no-cache-dir; \
     fi
-
-# Install tiktoken
-RUN pip3 install --no-cache-dir tiktoken && \
-    python3 -c "import os; import tiktoken; tiktoken.get_encoding('cl100k_base')"
-
-# Install the remaining requirements
-RUN pip3 install --no-cache-dir -r requirements.txt
 
 # Ensure the data directory exists and has correct permissions
 RUN mkdir -p /app/backend/data && chown -R $UID:$GID /app/backend/data

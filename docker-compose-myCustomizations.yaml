@@ -40,7 +40,7 @@ services:
       - OPENAI_API_BASE_URL=http://pipelines:9099
       - OPENAI_API_KEY=0p3n-w3bu!
       - TIKTOKEN_ENCODING_NAME=cl100k_base
-      - RAG_EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
+      - RAG_EMBEDDING_MODEL=intfloat/multilingual-e5-large
       - WHISPER_MODEL=ivrit-ai/faster-whisper-v2-d3-e3
       - WHISPER_MODEL_DIR=/app/backend/data/cache/whisper/models
       - SENTENCE_TRANSFORMERS_HOME=/app/backend/data/cache/embedding/models

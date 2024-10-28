@@ -3,6 +3,8 @@ services:
     devices:
       - /dev/kfd:/dev/kfd
       - /dev/dri:/dev/dri
-    image: ollama/ollama:${OLLAMA_DOCKER_TAG-rocm}
+    image: ghcr.io/oznav2/ilan-open-webui:my-customizations
     environment:
       - 'HSA_OVERRIDE_GFX_VERSION=${HSA_OVERRIDE_GFX_VERSION-11.0.0}'
+
+      

@@ -175,21 +175,36 @@ app.state.config.RAG_WEB_SEARCH_RESULT_COUNT = RAG_WEB_SEARCH_RESULT_COUNT
 app.state.config.RAG_WEB_SEARCH_CONCURRENT_REQUESTS = RAG_WEB_SEARCH_CONCURRENT_REQUESTS
 
 
+# def update_embedding_model(
+#     embedding_model: str,
+#     auto_update: bool = False,
+# ):
+#     if embedding_model and app.state.config.RAG_EMBEDDING_ENGINE == "":
+#         from sentence_transformers import SentenceTransformer
+
+#         app.state.sentence_transformer_ef = SentenceTransformer(
+#             get_model_path(embedding_model, auto_update),
+#             device=DEVICE_TYPE,
+#             trust_remote_code=RAG_EMBEDDING_MODEL_TRUST_REMOTE_CODE,
+#         )
+#     else:
+#         app.state.sentence_transformer_ef = None
+
+# reverting to old version of this function
 def update_embedding_model(
     embedding_model: str,
     auto_update: bool = False,
 ):
     if embedding_model and app.state.config.RAG_EMBEDDING_ENGINE == "":
-        from sentence_transformers import SentenceTransformer
+        import sentence_transformers
 
-        app.state.sentence_transformer_ef = SentenceTransformer(
+        app.state.sentence_transformer_ef = sentence_transformers.SentenceTransformer(
             get_model_path(embedding_model, auto_update),
             device=DEVICE_TYPE,
             trust_remote_code=RAG_EMBEDDING_MODEL_TRUST_REMOTE_CODE,
         )
     else:
         app.state.sentence_transformer_ef = None
-
 
 def update_reranking_model(
     reranking_model: str,

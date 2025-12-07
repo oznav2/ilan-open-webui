@@ -33,7 +33,7 @@ def get_filtered_results(results, filter_list):
         except Exception:
             pass
 
-        if is_string_allowed(hostnames, filter_list):
+        if any(is_string_allowed(hostname, filter_list) for hostname in hostnames):
             filtered_results.append(result)
             continue
 

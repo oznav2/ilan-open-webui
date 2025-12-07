@@ -1,0 +1,15 @@
+# Focused requirements for Open WebUI Pipelines
+# Based on actual imports and requirements from pipeline files
+
+# Core dependencies for memory_filter_openai_neo4j_pipeline.py
+pydantic==2.7.4
+openai==1.35.13
+mem0ai
+rank-bm25==0.2.2
+neo4j>=5.25.0
+langchain-community>=0.3.3
+
+# Basic dependencies that are likely already in the base image
+# but included for completeness
+typing-extensions
+requests

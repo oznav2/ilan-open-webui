@@ -98,7 +98,7 @@
 		</div>
 
 		{#if ollamaVersion}
-			<hr class=" border-gray-100/30 dark:border-gray-850/30" />
+			<hr class=" border-gray-100 dark:border-gray-850" />
 
 			<div>
 				<div class=" mb-2.5 text-sm font-medium">{$i18n.t('Ollama Version')}</div>
@@ -110,7 +110,7 @@
 			</div>
 		{/if}
 
-		<hr class=" border-gray-100/30 dark:border-gray-850/30" />
+		<hr class=" border-gray-100 dark:border-gray-850" />
 
 		{#if $config?.license_metadata}
 			<div class="mb-2 text-xs">
@@ -157,10 +157,27 @@
 				class="text-xs text-gray-400 dark:text-gray-500">Copyright (c) {new Date().getFullYear()} <a
 					href="https://openwebui.com"
 					target="_blank"
-					class="underline">Open WebUI Inc.</a
-				> <a href="https://github.com/open-webui/open-webui/blob/main/LICENSE" target="_blank"
-					>All rights reserved.</a
+					class="underline">ilanel שרת AI</a
 				>
+All rights reserved.
+
+ברוכים הבאים לשרת הבינה המלאכותית של אילן
+בין יתר השירותים שהשרת מספק תוכל להנות מממשק ידידותי לשיחות עם בינה מלאכותית
+כשהדגש הוא - פשטות השימוש - בממשק אינטואיטיבי המתאים גם למשתמשים חסרי רקע טכני
+
+פשוט הקלד את שאלתך או בקשתך בתיבת הטקסט, בחר את מודל הבינה המועדף עליך, ותקבל תשובה מיידית.
+ אין צורך בהגדרות מסובכות או ידע טכני
+
+בין היתר תוכל באמצעות המערכת לקבל גישה
+## תמיכה במגוון מודלים
+## ריבוי מודלים - תמיכה במודלים מגוונים כמו Llama, GPT, Claude, ועוד רבים אחרים
+שילוב מערכות - אינטגרציה מלאה עם Ollama, OpenAI, Anthropic, וספקי AI נוספים
+## מעבר חלק - אפשרות להחליף בקלות בין מודלים שונים באותו הממשק
+## התאמה אישית מתקדמת
+## שיחות מרובות - ניהול מספר שיחות במקביל בממשק נוח ואינטואיטיבי
+## היסטוריית שיחות - שמירה וארגון של כל ההתכתבויות הקודמות
+עיבוד קבצים - יכולת להעלות ולעבד מסמכים, תמונות וקבצים אחרים
+מצב RAG - תמיכה בשאילת שאלות על מסמכים ספציפיים (Retrieval Augmented Generation)
 </pre>
 		</div>
 
@@ -168,8 +185,8 @@
 			{$i18n.t('Created by')}
 			<a
 				class=" text-gray-500 dark:text-gray-300 font-medium"
-				href="https://github.com/tjbck"
-				target="_blank">Timothy J. Baek</a
+				href="https://''www.ilanel.co.il''"
+				target="_blank">Ilan Elhayani</a
 			>
 		</div>
 	</div>

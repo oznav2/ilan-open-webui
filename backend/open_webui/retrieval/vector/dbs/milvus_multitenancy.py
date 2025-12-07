@@ -157,6 +157,7 @@ class MilvusClient(VectorDBBase):
             for item in items
         ]
         collection.insert(entities)
+        collection.flush()
 
     def search(
         self, collection_name: str, vectors: List[List[float]], limit: int
@@ -262,23 +263,15 @@ class MilvusClient(VectorDBBase):
                 else:
                     expr.append(f"metadata['{key}'] == {value}")
 
-        iterator = collection.query_iterator(
+        results = collection.query(
             expr=" and ".join(expr),
             output_fields=["id", "text", "metadata"],
-            limit=limit if limit else -1,
+            limit=limit,
         )
 
-        all_results = []
-        while True:
-            batch = iterator.next()
-            if not batch:
-                iterator.close()
-                break
-            all_results.extend(batch)
-
-        ids = [res["id"] for res in all_results]
-        documents = [res["text"] for res in all_results]
-        metadatas = [res["metadata"] for res in all_results]
+        ids = [res["id"] for res in results]
+        documents = [res["text"] for res in results]
+        metadatas = [res["metadata"] for res in results]
 
         return GetResult(ids=[ids], documents=[documents], metadatas=[metadatas])
 

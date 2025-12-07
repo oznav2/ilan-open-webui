@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "docker-mcp-gateway": {
+      "command": "python3",
+      "args": ["/usr/local/bin/mcp-gateway-bridge.py"],
+      "env": {},
+      "disabled": false,
+      "autoApprove": []
+    }
+  }
+}

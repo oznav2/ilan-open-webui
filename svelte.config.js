@@ -20,8 +20,19 @@ const config = {
 		// poll for new version name every 60 seconds (to trigger reload mechanic in +layout.svelte)
 		version: {
 			name: (() => {
+				// For Docker builds, use BUILD_HASH or another fallback
+				if (process.env.DOCKER || process.env.WEBUI_BUILD_VERSION) {
+					return process.env.WEBUI_BUILD_VERSION || 'docker-build';
+				}
+				
+				// For non-Docker builds, try git first
 				try {
-					return child_process.execSync('git rev-parse HEAD').toString().trim();
+					// Check if .git directory exists before running git command
+					if (fs.existsSync('.git')) {
+						return child_process.execSync('git rev-parse HEAD').toString().trim();
+					} else {
+						throw new Error('Not a git repository');
+					}
 				} catch {
 					// if git is not available, fallback to package.json version
 					// or current timestamp

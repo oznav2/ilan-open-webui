@@ -51,8 +51,6 @@ export const chatId = writable('');
 export const chatTitle = writable('');
 
 export const channels = writable([]);
-export const channelId = writable(null);
-
 export const chats = writable(null);
 export const pinnedChats = writable([]);
 export const tags = writable([]);

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { decode } from 'html-entities';
+	import DOMPurify from 'dompurify';
 	import { onMount, getContext } from 'svelte';
 	const i18n = getContext('i18n');
 
@@ -33,8 +34,6 @@
 
 	export let save = false;
 	export let preview = false;
-
-	export let paragraphTag = 'p';
 
 	export let editCodeBlock = true;
 	export let topPadding = false;
@@ -90,7 +89,7 @@
 <!-- {JSON.stringify(tokens)} -->
 {#each tokens as token, tokenIdx (tokenIdx)}
 	{#if token.type === 'hr'}
-		<hr class=" border-gray-100/30 dark:border-gray-850/30" />
+		<hr class=" border-gray-100 dark:border-gray-850" />
 	{:else if token.type === 'heading'}
 		<svelte:element this={headerComponent(token.depth)} dir="auto">
 			<MarkdownInlineTokens
@@ -352,27 +351,15 @@
 			}}
 		></iframe>
 	{:else if token.type === 'paragraph'}
-		{#if paragraphTag == 'span'}
-			<span dir="auto">
-				<MarkdownInlineTokens
-					id={`${id}-${tokenIdx}-p`}
-					tokens={token.tokens ?? []}
-					{done}
-					{sourceIds}
-					{onSourceClick}
-				/>
-			</span>
-		{:else}
-			<p dir="auto">
-				<MarkdownInlineTokens
-					id={`${id}-${tokenIdx}-p`}
-					tokens={token.tokens ?? []}
-					{done}
-					{sourceIds}
-					{onSourceClick}
-				/>
-			</p>
-		{/if}
+		<p dir="auto">
+			<MarkdownInlineTokens
+				id={`${id}-${tokenIdx}-p`}
+				tokens={token.tokens ?? []}
+				{done}
+				{sourceIds}
+				{onSourceClick}
+			/>
+		</p>
 	{:else if token.type === 'text'}
 		{#if top}
 			<p>

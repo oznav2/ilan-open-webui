@@ -583,16 +583,14 @@ OAUTH_ROLES_CLAIM = PersistentConfig(
     os.environ.get("OAUTH_ROLES_CLAIM", "roles"),
 )
 
-OAUTH_ROLES_SEPARATOR = os.environ.get("OAUTH_ROLES_SEPARATOR", ",")
+SEP = os.environ.get("OAUTH_ROLES_SEPARATOR", ",")
 
 OAUTH_ALLOWED_ROLES = PersistentConfig(
     "OAUTH_ALLOWED_ROLES",
     "oauth.allowed_roles",
     [
         role.strip()
-        for role in os.environ.get(
-            "OAUTH_ALLOWED_ROLES", f"user{OAUTH_ROLES_SEPARATOR}admin"
-        ).split(OAUTH_ROLES_SEPARATOR)
+        for role in os.environ.get("OAUTH_ALLOWED_ROLES", f"user{SEP}admin").split(SEP)
         if role
     ],
 )
@@ -602,9 +600,7 @@ OAUTH_ADMIN_ROLES = PersistentConfig(
     "oauth.admin_roles",
     [
         role.strip()
-        for role in os.environ.get("OAUTH_ADMIN_ROLES", "admin").split(
-            OAUTH_ROLES_SEPARATOR
-        )
+        for role in os.environ.get("OAUTH_ADMIN_ROLES", "admin").split(SEP)
         if role
     ],
 )
@@ -1447,16 +1443,8 @@ USER_PERMISSIONS_FEATURES_CODE_INTERPRETER = (
     == "true"
 )
 
-USER_PERMISSIONS_FEATURES_FOLDERS = (
-    os.environ.get("USER_PERMISSIONS_FEATURES_FOLDERS", "True").lower() == "true"
-)
-
 USER_PERMISSIONS_FEATURES_NOTES = (
     os.environ.get("USER_PERMISSIONS_FEATURES_NOTES", "True").lower() == "true"
-)
-
-USER_PERMISSIONS_FEATURES_CHANNELS = (
-    os.environ.get("USER_PERMISSIONS_FEATURES_CHANNELS", "True").lower() == "true"
 )
 
 USER_PERMISSIONS_FEATURES_API_KEYS = (
@@ -1511,16 +1499,12 @@ DEFAULT_USER_PERMISSIONS = {
         "temporary_enforced": USER_PERMISSIONS_CHAT_TEMPORARY_ENFORCED,
     },
     "features": {
-        # General features
         "api_keys": USER_PERMISSIONS_FEATURES_API_KEYS,
-        "notes": USER_PERMISSIONS_FEATURES_NOTES,
-        "folders": USER_PERMISSIONS_FEATURES_FOLDERS,
-        "channels": USER_PERMISSIONS_FEATURES_CHANNELS,
         "direct_tool_servers": USER_PERMISSIONS_FEATURES_DIRECT_TOOL_SERVERS,
-        # Chat features
         "web_search": USER_PERMISSIONS_FEATURES_WEB_SEARCH,
         "image_generation": USER_PERMISSIONS_FEATURES_IMAGE_GENERATION,
         "code_interpreter": USER_PERMISSIONS_FEATURES_CODE_INTERPRETER,
+        "notes": USER_PERMISSIONS_FEATURES_NOTES,
     },
 }
 
@@ -1528,12 +1512,6 @@ USER_PERMISSIONS = PersistentConfig(
     "USER_PERMISSIONS",
     "user.permissions",
     DEFAULT_USER_PERMISSIONS,
-)
-
-ENABLE_FOLDERS = PersistentConfig(
-    "ENABLE_FOLDERS",
-    "folders.enable",
-    os.environ.get("ENABLE_FOLDERS", "True").lower() == "true",
 )
 
 ENABLE_CHANNELS = PersistentConfig(
@@ -1716,7 +1694,7 @@ TITLE_GENERATION_PROMPT_TEMPLATE = PersistentConfig(
 )
 
 DEFAULT_TITLE_GENERATION_PROMPT_TEMPLATE = """### Task:
-Generate a concise, 3-5 word title with an emoji summarizing the chat history.
+Generate a concise, 3-5 word title in Hebrew Language with an emoji summarizing the chat history.
 ### Guidelines:
 - The title should clearly represent the main theme or subject of the conversation.
 - Use emojis that enhance understanding of the topic, but avoid quotation marks or special formatting.
@@ -1728,12 +1706,11 @@ Generate a concise, 3-5 word title with an emoji summarizing the chat history.
 ### Output:
 JSON format: { "title": "your concise title here" }
 ### Examples:
-- { "title": "📉 Stock Market Trends" },
-- { "title": "🍪 Perfect Chocolate Chip Recipe" },
-- { "title": "Evolution of Music Streaming" },
-- { "title": "Remote Work Productivity Tips" },
-- { "title": "Artificial Intelligence in Healthcare" },
-- { "title": "🎮 Video Game Development Insights" }
+- { "title": "📉 מגמות שוק בבורסה" },
+- { "title": "🍪 מתכון מושלם לעוגת שוקולד" },
+- { "title": "האבולוציה של הזרמת מוזיקה" },
+- { "title": "טיפים לשיפור מובילות עבודה" },
+- { "title": "תכנות משחקי וידאו" },
 ### Chat History:
 <chat_history>
 {{MESSAGES:END:2}}
@@ -1746,7 +1723,7 @@ TAGS_GENERATION_PROMPT_TEMPLATE = PersistentConfig(
 )
 
 DEFAULT_TAGS_GENERATION_PROMPT_TEMPLATE = """### Task:
-Generate 1-3 broad tags categorizing the main themes of the chat history, along with 1-3 more specific subtopic tags.
+Generate 1-3 broad tags in Hebrew Language categorizing the main themes of the chat history, along with 1-3 more specific subtopic tags.
 
 ### Guidelines:
 - Start with high-level domains (e.g. Science, Technology, Philosophy, Arts, Politics, Business, Health, Sports, Entertainment, Education)
@@ -1797,16 +1774,16 @@ FOLLOW_UP_GENERATION_PROMPT_TEMPLATE = PersistentConfig(
 )
 
 DEFAULT_FOLLOW_UP_GENERATION_PROMPT_TEMPLATE = """### Task:
-Suggest 3-5 relevant follow-up questions or prompts that the user might naturally ask next in this conversation as a **user**, based on the chat history, to help continue or deepen the discussion.
+Suggest 3-5 relevant follow-up questions or prompts in Hebrew Language that the user might naturally ask next in this conversation as a **user**, based on the chat history, to help continue or deepen the discussion.
 ### Guidelines:
-- Write all follow-up questions from the user’s point of view, directed to the assistant.
-- Make questions concise, clear, and directly related to the discussed topic(s).
-- Only suggest follow-ups that make sense given the chat content and do not repeat what was already covered.
-- If the conversation is very short or not specific, suggest more general (but relevant) follow-ups the user might ask.
-- Use the conversation's primary language; default to English if multilingual.
-- Response must be a JSON array of strings, no extra text or formatting.
+- Write all follow-up questions in Hebrew Language, from the user’s point of view, directed to the assistant.
+- Make questions in Hebrew language concise, clear, and directly related to the discussed topic(s).
+- Only suggest follow-ups in Hebrew language that make sense given the chat content and do not repeat what was already covered.
+- If the conversation is very short or not specific, suggest more general (but relevant) follow-ups in Hebrew language the user might ask.
+- Use the conversation's primary language; default to Hebrew if multilingual.
+- Response must be a JSON array of strings in Hebrew language, no extra text or formatting.
 ### Output:
-JSON format: { "follow_ups": ["Question 1?", "Question 2?", "Question 3?"] }
+JSON format: { "follow_ups": ["� שאלה 1?", "� שאלה 2?", "� שאלה 3?"] }
 ### Chat History:
 <chat_history>
 {{MESSAGES:END:6}}
@@ -2588,12 +2565,6 @@ DOCUMENT_INTELLIGENCE_KEY = PersistentConfig(
     "DOCUMENT_INTELLIGENCE_KEY",
     "rag.document_intelligence_key",
     os.getenv("DOCUMENT_INTELLIGENCE_KEY", ""),
-)
-
-DOCUMENT_INTELLIGENCE_MODEL = PersistentConfig(
-    "DOCUMENT_INTELLIGENCE_MODEL",
-    "rag.document_intelligence_model",
-    os.getenv("DOCUMENT_INTELLIGENCE_MODEL", "prebuilt-layout"),
 )
 
 MISTRAL_OCR_API_BASE_URL = PersistentConfig(

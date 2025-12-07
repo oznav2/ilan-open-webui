@@ -46,23 +46,7 @@ router = APIRouter()
 
 
 @router.get("/", response_model=list[FolderNameIdResponse])
-async def get_folders(request: Request, user=Depends(get_verified_user)):
-    if request.app.state.config.ENABLE_FOLDERS is False:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail=ERROR_MESSAGES.ACCESS_PROHIBITED,
-        )
-
-    if user.role != "admin" and not has_permission(
-        user.id,
-        "features.folders",
-        request.app.state.config.USER_PERMISSIONS,
-    ):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail=ERROR_MESSAGES.ACCESS_PROHIBITED,
-        )
-
+async def get_folders(user=Depends(get_verified_user)):
     folders = Folders.get_folders_by_user_id(user.id)
 
     # Verify folder data integrity

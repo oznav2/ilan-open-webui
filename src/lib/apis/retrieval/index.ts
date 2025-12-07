@@ -35,7 +35,6 @@ type ChunkConfigForm = {
 type DocumentIntelligenceConfigForm = {
 	key: string;
 	endpoint: string;
-	model: string;
 };
 
 type ContentExtractConfigForm = {

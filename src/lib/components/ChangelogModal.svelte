@@ -63,7 +63,7 @@
 			<div class="mb-3">
 				{#if changelog}
 					{#each Object.keys(changelog) as version}
-						<div class=" mb-3 pr-2">
+						<div class="mb-3 pr-2 text-right">
 							<div class="font-semibold text-xl mb-1 dark:text-white">
 								v{version} - {changelog[version].date}
 							</div>
@@ -100,7 +100,7 @@
 				{/if}
 			</div>
 		</div>
-		<div class="flex justify-end pt-3 text-sm font-medium">
+		<div class="flex justify-start pt-3 text-sm font-medium">
 			<button
 				on:click={async () => {
 					localStorage.version = $config.version;
@@ -110,7 +110,7 @@
 				}}
 				class="px-3.5 py-1.5 text-sm font-medium bg-black hover:bg-gray-900 text-white dark:bg-white dark:text-black dark:hover:bg-gray-100 transition rounded-full"
 			>
-				<span class="relative">{$i18n.t("Okay, Let's Go!")}</span>
+				<span class="relative">{$i18n.t("הבנתי. יאללה בואו נתחיל")}</span>
 			</button>
 		</div>
 	</div>

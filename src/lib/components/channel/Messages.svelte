@@ -16,14 +16,7 @@
 	import Message from './Messages/Message.svelte';
 	import Loader from '../common/Loader.svelte';
 	import Spinner from '../common/Spinner.svelte';
-	import {
-		addReaction,
-		deleteMessage,
-		pinMessage,
-		removeReaction,
-		updateMessage
-	} from '$lib/apis/channels';
-	import { WEBUI_API_BASE_URL } from '$lib/constants';
+	import { addReaction, deleteMessage, removeReaction, updateMessage } from '$lib/apis/channels';
 
 	const i18n = getContext('i18n');
 
@@ -75,31 +68,7 @@
 			<div class="px-5 max-w-full mx-auto">
 				{#if channel}
 					<div class="flex flex-col gap-1.5 pb-5 pt-10">
-						{#if channel?.type === 'dm'}
-							<div class="flex ml-[1px] mr-0.5">
-								{#each channel.users.filter((u) => u.id !== $user?.id).slice(0, 2) as u, index}
-									<img
-										src={`${WEBUI_API_BASE_URL}/users/${u.id}/profile/image`}
-										alt={u.name}
-										class=" size-7.5 rounded-full border-2 border-white dark:border-gray-900 {index ===
-										1
-											? '-ml-2.5'
-											: ''}"
-									/>
-								{/each}
-							</div>
-						{/if}
-
-						<div class="text-2xl font-medium capitalize">
-							{#if channel?.name}
-								{channel.name}
-							{:else}
-								{channel?.users
-									?.filter((u) => u.id !== $user?.id)
-									.map((u) => u.name)
-									.join(', ')}
-							{/if}
-						</div>
+						<div class="text-2xl font-medium capitalize">{channel.name}</div>
 
 						<div class=" text-gray-500">
 							{$i18n.t(
@@ -128,12 +97,11 @@
 				{message}
 				{thread}
 				replyToMessage={replyToMessage?.id === message.id}
-				disabled={!channel?.write_access || message?.temp_id}
-				pending={!!message?.temp_id}
+				disabled={!channel?.write_access}
 				showUserProfile={messageIdx === 0 ||
 					messageList.at(messageIdx - 1)?.user_id !== message.user_id ||
 					messageList.at(messageIdx - 1)?.meta?.model_id !== message?.meta?.model_id ||
-					message?.reply_to_message !== null}
+					message?.reply_to_message}
 				onDelete={() => {
 					messages = messages.filter((m) => m.id !== message.id);
 
@@ -162,26 +130,6 @@
 				onReply={(message) => {
 					onReply(message);
 				}}
-				onPin={async (message) => {
-					messages = messages.map((m) => {
-						if (m.id === message.id) {
-							m.is_pinned = !m.is_pinned;
-							m.pinned_by = !m.is_pinned ? null : $user?.id;
-							m.pinned_at = !m.is_pinned ? null : Date.now() * 1000000;
-						}
-						return m;
-					});
-
-					const updatedMessage = await pinMessage(
-						localStorage.token,
-						message.channel_id,
-						message.id,
-						message.is_pinned
-					).catch((error) => {
-						toast.error(`${error}`);
-						return null;
-					});
-				}}
 				onThread={(id) => {
 					onThread(id);
 				}}
@@ -189,7 +137,7 @@
 					if (
 						(message?.reactions ?? [])
 							.find((reaction) => reaction.name === name)
-							?.users?.some((u) => u.id === $user?.id) ??
+							?.user_ids?.includes($user?.id) ??
 						false
 					) {
 						messages = messages.map((m) => {
@@ -197,8 +145,8 @@
 								const reaction = m.reactions.find((reaction) => reaction.name === name);
 
 								if (reaction) {
-									reaction.users = reaction.users.filter((u) => u.id !== $user?.id);
-									reaction.count = reaction.users.length;
+									reaction.user_ids = reaction.user_ids.filter((id) => id !== $user?.id);
+									reaction.count = reaction.user_ids.length;
 
 									if (reaction.count === 0) {
 										m.reactions = m.reactions.filter((r) => r.name !== name);
@@ -224,12 +172,12 @@
 									const reaction = m.reactions.find((reaction) => reaction.name === name);
 
 									if (reaction) {
-										reaction.users.push({ id: $user?.id, name: $user?.name });
-										reaction.count = reaction.users.length;
+										reaction.user_ids.push($user?.id);
+										reaction.count = reaction.user_ids.length;
 									} else {
 										m.reactions.push({
 											name: name,
-											users: [{ id: $user?.id, name: $user?.name }],
+											user_ids: [$user?.id],
 											count: 1
 										});
 									}

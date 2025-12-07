@@ -6,7 +6,6 @@ import sys
 from aiocache import cached
 from fastapi import Request
 
-from open_webui.socket.utils import RedisDict
 from open_webui.routers import openai, ollama
 from open_webui.functions import get_function_models
 
@@ -191,8 +190,6 @@ async def get_all_models(request, refresh: bool = False, user: UserModel = None)
         ):
             # Custom model based on a base model
             owned_by = "openai"
-            connection_type = None
-
             pipe = None
 
             for m in models:
@@ -203,8 +200,6 @@ async def get_all_models(request, refresh: bool = False, user: UserModel = None)
                     owned_by = m.get("owned_by", "unknown")
                     if "pipe" in m:
                         pipe = m["pipe"]
-
-                    connection_type = m.get("connection_type", None)
                     break
 
             model = {
@@ -213,7 +208,6 @@ async def get_all_models(request, refresh: bool = False, user: UserModel = None)
                 "object": "model",
                 "created": custom_model.created_at,
                 "owned_by": owned_by,
-                "connection_type": connection_type,
                 "preset": True,
                 **({"pipe": pipe} if pipe is not None else {}),
             }
@@ -329,12 +323,7 @@ async def get_all_models(request, refresh: bool = False, user: UserModel = None)
 
     log.debug(f"get_all_models() returned {len(models)} models")
 
-    models_dict = {model["id"]: model for model in models}
-    if isinstance(request.app.state.MODELS, RedisDict):
-        request.app.state.MODELS.set(models_dict)
-    else:
-        request.app.state.MODELS = models_dict
-
+    request.app.state.MODELS = {model["id"]: model for model in models}
     return models
 
 

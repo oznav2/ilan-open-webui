@@ -1,0 +1,62 @@
+{
+  "scan_date": "2025-04-20T21:05:19.784454",
+  "container_versions": {
+    "qdrant/qdrant": "v1.13.6-unprivileged",
+    "ollama/ollama": "0.6.6",
+    "prom/prometheus": "v3.3.0",
+    "n8nio/n8n": "1.89.2",
+    "flowiseai/flowise": "2.2.7-patch.1"
+  },
+  "compose_versions": {
+    "postgres": "16.1",
+    "redis": "alpine",
+    "qdrant/qdrant": "latest",
+    "ollama/ollama": "latest",
+    "ghcr.io/berriai/litellm": "main-latest",
+    "apache/tika": "latest-full",
+    "mcr.microsoft.com/playwright": "v1.49.1-noble",
+    "ghcr.io/open-webui/pipelines": "latest-cuda",
+    "n8nio/n8n": "latest",
+    "quay.io/unstructured-io/unstructured-api": "latest",
+    "ghcr.io/linkwarden/linkwarden": "latest",
+    "flowiseai/flowise": "latest",
+    "searxng/searxng": "latest",
+    "prom/prometheus": "latest",
+    "dpage/pgadmin4": "latest",
+    "nginx": "alpine",
+    "nicolargo/glances": "latest",
+    "linuxserver/duplicati": "latest"
+  },
+  "comparison_results": [
+    {
+      "container": "qdrant/qdrant",
+      "compose_version": "latest",
+      "latest_version": "v1.13.6-unprivileged",
+      "status": "UNKNOWN (using latest tag)"
+    },
+    {
+      "container": "ollama/ollama",
+      "compose_version": "latest",
+      "latest_version": "0.6.6",
+      "status": "UNKNOWN (using latest tag)"
+    },
+    {
+      "container": "prom/prometheus",
+      "compose_version": "latest",
+      "latest_version": "v3.3.0",
+      "status": "UNKNOWN (using latest tag)"
+    },
+    {
+      "container": "n8nio/n8n",
+      "compose_version": "latest",
+      "latest_version": "1.89.2",
+      "status": "UNKNOWN (using latest tag)"
+    },
+    {
+      "container": "flowiseai/flowise",
+      "compose_version": "latest",
+      "latest_version": "2.2.7-patch.1",
+      "status": "UNKNOWN (using latest tag)"
+    }
+  ]
+}

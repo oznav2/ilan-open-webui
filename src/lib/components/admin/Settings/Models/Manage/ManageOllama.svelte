@@ -811,8 +811,9 @@
 								bind:value={deleteModelTag}
 								placeholder={$i18n.t('Select a model')}
 							>
-								<option value="" disabled selected>{$i18n.t('Select a model')}</option>
-
+								{#if !deleteModelTag}
+									<option value="" disabled selected>{$i18n.t('Select a model')}</option>
+								{/if}
 								{#each ollamaModels as model}
 									<option value={model.id} class="bg-gray-50 dark:bg-gray-700"
 										>{model.name + ' (' + (model.size / 1024 ** 3).toFixed(1) + ' GB)'}</option

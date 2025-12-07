@@ -2,7 +2,9 @@ import typography from '@tailwindcss/typography';
 import containerQueries from '@tailwindcss/container-queries';
 
 /** @type {import('tailwindcss').Config} */
-export default {
+const typography = require('@tailwindcss/typography');
+
+module.exports = {
 	darkMode: 'class',
 	content: ['./src/**/*.{html,js,svelte,ts}'],
 	theme: {

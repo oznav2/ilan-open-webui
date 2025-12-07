@@ -1,0 +1,182 @@
+# syntax=docker/dockerfile:1
+
+######## WebUI backend ########
+FROM python:3.11-slim-bookworm AS base
+
+# Build arguments
+ARG USE_EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
+ARG USE_RERANKING_MODEL=""
+ARG USE_CUDA=true
+ARG USE_OLLAMA=false
+ARG USE_CUDA_VER=cu128
+ARG ANTHROPIC_API_KEY
+ARG GROQ_API_KEY
+ARG OPENWEATHERMAP_API_KEY
+ARG GOOGLE_API_KEY
+ARG GOOGLE_SEARCH_ID
+ARG WOLFRAM_APP_ID
+ARG TAVILIY_SEARCH_API_KEY
+ARG SERPLY_SEARCH_API_KEY
+ARG BRAVE_SEARCH_API_KEY
+ARG SERPER_SEARCH_API_KEY
+ARG JINA_SEARCH_API_KEY
+ARG BING_SEARCH_API_KEY
+ARG MISTRAL_API_KEY
+ARG FINNHUB_API_KEY
+ARG TIKTOKEN_ENCODING_MODEL_NAME="cl100k_base"
+ARG UID=0
+ARG GID=0
+ARG OPEN_WEBUI_VERSION=main
+ARG BUILD_HASH=dev-build
+
+# Set environment variables
+ENV ENV=prod \
+    PORT=8080 \
+    USE_EMBEDDING_MODEL_DOCKER=${USE_EMBEDDING_MODEL} \
+    USE_RERANKING_MODEL_DOCKER=${USE_RERANKING_MODEL} \
+    USE_CUDA_DOCKER_VER=${USE_CUDA_VER} \
+    USE_CUDA_DOCKER=${USE_CUDA} \
+    OLLAMA_BASE_URL="/ollama" \
+    OPENAI_API_BASE_URL="https://api.openai.com/v1" \
+    OPENAI_API_KEY="" \
+    WEBUI_SECRET_KEY="" \
+    SCARF_NO_ANALYTICS=true \
+    DO_NOT_TRACK=true \
+    ANONYMIZED_TELEMETRY=false \
+    WHISPER_MODEL="base" \
+    WHISPER_MODEL_DIR="/app/backend/data/cache/whisper/models" \
+    RAG_EMBEDDING_MODEL="$USE_EMBEDDING_MODEL_DOCKER" \
+    RAG_RERANKING_MODEL="$USE_RERANKING_MODEL_DOCKER" \
+    SENTENCE_TRANSFORMERS_HOME="/app/backend/data/cache/embedding/models" \
+    HF_HOME="/app/backend/data/cache/embedding/models" \
+    TIKTOKEN_ENCODING_MODEL_NAME="${TIKTOKEN_ENCODING_MODEL_NAME}" \
+    TIKTOKEN_CACHE_DIR="/app/backend/data/cache/tiktoken" \
+    GROQ_API_BASE_URL="https://api.groq.com/openai/v1" \
+    GROQ_API_KEY=${GROQ_API_KEY} \
+    ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY} \
+    ANTHROPIC_BASE_URL="https://api.anthropic.com/v1/complete" \
+    OPENWEATHERMAP_API_KEY=${OPENWEATHERMAP_API_KEY} \
+    GOOGLE_API_KEY=${GOOGLE_API_KEY} \
+    GOOGLE_SEARCH_ID=${GOOGLE_SEARCH_ID} \
+    WOLFRAM_APP_ID=${WOLFRAM_APP_ID} \
+    WOLFRAM_BASE_URL="https://www.wolframalpha.com/api/v1/llm-api" \
+    TAVILIY_BASE_URL="https://api.tavily.com/" \
+    TAVILIY_SEARCH_API_KEY=${TAVILIY_SEARCH_API_KEY} \
+    SERPLY_BASE_URL="api.serply.io/v1/search/q=search+api" \
+    SERPLY_SEARCH_API_KEY=${SERPLY_SEARCH_API_KEY} \
+    BRAVE_SEARCH_API_KEY=${BRAVE_SEARCH_API_KEY} \
+    BRAVE_SEARCH_VIDEO_URL="https://api.search.brave.com/res/v1/videos/search" \
+    BRAVE_SEARCH_IMAGE_URL="https://api.search.brave.com/res/v1/images/search" \
+    SERPER_BASE_URL="https://google.serper.dev/search" \
+    SERPER_SEARCH_API_KEY=${SERPER_SEARCH_API_KEY} \
+    JINA_BASE_URL="https://r.jina.ai/" \
+    JINA_SEARCH_URL="https://s.jina.ai" \
+    JINA_SEARCH_API_KEY=${JINA_SEARCH_API_KEY} \
+    BING_BASE_URL="https://api.bing.microsoft.com/v7.0/search" \
+    BING_SEARCH_API_KEY=${BING_SEARCH_API_KEY} \
+    MISTRAL_BASE_URL="https://api.mistral.ai/v1/chat/completions" \
+    MISTRAL_API_KEY=${MISTRAL_API_KEY} \
+    FINNHUB_API_KEY=${FINNHUB_API_KEY} \
+    HOME=/root
+    
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends git curl wget cmake g++ build-essential pandoc gcc netcat-openbsd libglib2.0-0 libgl1 jq && \
+    apt-get install -y --no-install-recommends python3-dev && \
+    apt-get install -y --no-install-recommends ffmpeg libsm6 libxext6 && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Clone repository and checkout the specific release or branch
+RUN git clone https://github.com/open-webui/open-webui.git && \
+    cd open-webui && \
+    git checkout ${OPEN_WEBUI_VERSION} && \
+    cd .. && \
+    cp -r open-webui/* /app/ && \
+    rm -rf open-webui
+
+######## WebUI frontend ########
+FROM --platform=$BUILDPLATFORM node:18-alpine3.18 AS build
+
+# Pass build arguments from base stage
+ARG BUILD_HASH=dev-build
+
+WORKDIR /app
+
+# Install git in the build stage (but we won't rely on it)
+RUN apk add --no-cache git
+
+# Set environment variables for the build
+ENV DOCKER=true \
+    WEBUI_BUILD_VERSION=${BUILD_HASH}
+
+# Copy necessary files from base
+COPY --from=base /app /app
+
+# Use our pre-created Docker-specific svelte.config.js file
+COPY ./svelte.config.docker.js /app/svelte.config.js
+
+# Copy custom files (Ensure these files are in the build context)
+COPY ./src/lib/i18n/locales/he-IL/translation.json /app/src/lib/i18n/locales/he-IL/translation.json
+COPY ./static/favicon.png /app/static/favicon.png
+COPY ./static/Hewiki.png /app/static/Hewiki.png
+COPY ./static/user.png /app/static/user.png
+COPY ./static/static/favicon.png /app/static/static/favicon.png
+COPY ./static/favicon/web-app-manifest-192x192.png /app/static/static/favicon/web-app-manifest-192x192.png
+COPY ./static/favicon/web-app-manifest-512x512.png /app/static/static/favicon/web-app-manifest-512x512.png
+COPY ./static/static/splash.png /app/static/static/splash.png
+COPY ./static/static/splash-dark.png /app/static/static/splash-dark.png
+COPY ./CHANGELOG-heb.md /app/CHANGELOG.md
+COPY ./src/lib/components/chat/Settings/About.svelte /app/src/lib/components/chat/Settings/About.svelte
+COPY ./src/lib/components/ChangelogModal.svelte /app/src/lib/components/ChangelogModal.svelte
+COPY ./backend/open_webui/routers/ollama.py /app/backend/open_webui/routers/ollama.py
+COPY ./backend/open_webui/main.py /app/backend/open_webui/main.py
+
+# Build frontend
+RUN npm cache clean --force && \
+    npm i @tailwindcss/typography --force && \
+    npm ci --force && \
+    npm run build
+
+######## Final Stage ########
+FROM base AS final
+
+# Pass build arguments from base stage
+ARG BUILD_HASH=dev-build
+
+# Copy built frontend from build stage
+COPY --from=build /app/build /app/build
+COPY ./CHANGELOG-heb.md /app/CHANGELOG.md
+
+WORKDIR /app/backend
+
+# Setup Chroma
+RUN mkdir -p $HOME/.cache/chroma && \
+    echo -n 00000000-0000-0000-0000-000000000000 > $HOME/.cache/chroma/telemetry_user_id
+
+# Install Python packages
+RUN pip3 install -U pip setuptools wheel && \
+    pip3 install -U uv && \
+    if [ "$USE_CUDA" = "true" ]; then \
+        pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/${USE_CUDA_VER} --no-cache-dir; \
+    else \
+        pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu --no-cache-dir; \
+    fi && \
+    pip3 install --no-cache-dir -r requirements.txt && \
+    python -c "import os; from sentence_transformers import SentenceTransformer; SentenceTransformer(os.environ['RAG_EMBEDDING_MODEL'], device='cpu')" && \
+    python -c "import os; from faster_whisper import WhisperModel; WhisperModel(os.environ['WHISPER_MODEL'], device='cpu', compute_type='int8', download_root=os.environ['WHISPER_MODEL_DIR'])" && \
+    python -c "import os; import tiktoken; tiktoken.get_encoding(os.environ['TIKTOKEN_ENCODING_MODEL_NAME'])"
+
+EXPOSE 8080
+
+HEALTHCHECK CMD curl --silent --fail http://localhost:${PORT:-8080}/health | jq -ne 'input.status == true' || exit 1
+
+ENV WEBUI_BUILD_VERSION=${BUILD_HASH} \
+    DOCKER=true
+
+# Run as root user as required by the project
+USER root
+
+CMD [ "bash", "start.sh" ]

@@ -292,8 +292,10 @@
 
 						<hr class=" border-gray-100 dark:border-gray-700/10 my-2.5 w-full" />
 
-						<div class="my-2">
-							<AccessControl bind:accessControl />
+						<div class="my-2 -mx-2">
+							<div class="px-4 py-3 bg-gray-50 dark:bg-gray-950 rounded-3xl">
+								<AccessControl bind:accessControl />
+							</div>
 						</div>
 
 						<hr class=" border-gray-100 dark:border-gray-700/10 my-2.5 w-full" />
@@ -350,7 +352,7 @@
 
 						<div class="flex items-center">
 							<select
-								class="dark:bg-gray-900 w-full py-1 text-sm rounded-lg bg-transparent {selectedModelId
+								class="w-full py-1 text-sm rounded-lg bg-transparent {selectedModelId
 									? ''
 									: 'text-gray-500'} placeholder:text-gray-300 dark:placeholder:text-gray-700 outline-hidden"
 								bind:value={selectedModelId}

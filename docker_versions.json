@@ -1,0 +1,150 @@
+{
+  "scan_date": "2025-04-20T21:09:33.547726",
+  "docker_compose_file": "docker-compose-ilan-stack.yaml",
+  "container_versions": {
+    "redis": "7.4.2-bookworm",
+    "postgres": "14.17-bookworm",
+    "qdrant/qdrant": "v1.13.6-unprivileged",
+    "ollama/ollama": "0.6.6",
+    "apache/tika": "3.1.0.0-full",
+    "n8nio/n8n": "1.89.2",
+    "quay.io/unstructured-io/unstructured-api": "latest",
+    "flowiseai/flowise": "2.2.7-patch.1",
+    "searxng/searxng": "2025.4.18-5ae3b3f17",
+    "prom/prometheus": "v3.3.0",
+    "dpage/pgadmin4": "9.2.0",
+    "nginx": "1.26.3-alpine3.20-perl",
+    "nicolargo/glances": "4.3.1",
+    "linuxserver/duplicati": "2.1.0"
+  },
+  "compose_versions": {
+    "postgres": "16.1",
+    "redis": "alpine",
+    "qdrant/qdrant": "latest",
+    "ollama/ollama": "latest",
+    "ghcr.io/berriai/litellm": "main-latest",
+    "apache/tika": "latest-full",
+    "mcr.microsoft.com/playwright": "v1.49.1-noble",
+    "ghcr.io/open-webui/pipelines": "latest-cuda",
+    "n8nio/n8n": "latest",
+    "quay.io/unstructured-io/unstructured-api": "latest",
+    "ghcr.io/linkwarden/linkwarden": "latest",
+    "flowiseai/flowise": "latest",
+    "searxng/searxng": "latest",
+    "prom/prometheus": "latest",
+    "dpage/pgadmin4": "latest",
+    "nginx": "alpine",
+    "nicolargo/glances": "latest",
+    "linuxserver/duplicati": "latest"
+  },
+  "comparison_results": [
+    {
+      "container": "postgres",
+      "compose_version": "16.1",
+      "latest_version": "14.17-bookworm",
+      "status": "UNKNOWN (can't compare versions)"
+    },
+    {
+      "container": "redis",
+      "compose_version": "alpine",
+      "latest_version": "7.4.2-bookworm",
+      "status": "UNKNOWN (can't compare versions)"
+    },
+    {
+      "container": "qdrant/qdrant",
+      "compose_version": "latest",
+      "latest_version": "v1.13.6-unprivileged",
+      "status": "UNKNOWN (using latest tag)"
+    },
+    {
+      "container": "ollama/ollama",
+      "compose_version": "latest",
+      "latest_version": "0.6.6",
+      "status": "UNKNOWN (using latest tag)"
+    },
+    {
+      "container": "ghcr.io/berriai/litellm",
+      "compose_version": "main-latest",
+      "latest_version": "UNKNOWN",
+      "status": "COULDN'T DETERMINE"
+    },
+    {
+      "container": "apache/tika",
+      "compose_version": "latest-full",
+      "latest_version": "3.1.0.0-full",
+      "status": "UNKNOWN (can't compare versions)"
+    },
+    {
+      "container": "mcr.microsoft.com/playwright",
+      "compose_version": "v1.49.1-noble",
+      "latest_version": "UNKNOWN",
+      "status": "COULDN'T DETERMINE"
+    },
+    {
+      "container": "ghcr.io/open-webui/pipelines",
+      "compose_version": "latest-cuda",
+      "latest_version": "UNKNOWN",
+      "status": "COULDN'T DETERMINE"
+    },
+    {
+      "container": "n8nio/n8n",
+      "compose_version": "latest",
+      "latest_version": "1.89.2",
+      "status": "UNKNOWN (using latest tag)"
+    },
+    {
+      "container": "quay.io/unstructured-io/unstructured-api",
+      "compose_version": "latest",
+      "latest_version": "latest",
+      "status": "UNKNOWN (using latest tag)"
+    },
+    {
+      "container": "ghcr.io/linkwarden/linkwarden",
+      "compose_version": "latest",
+      "latest_version": "UNKNOWN",
+      "status": "COULDN'T DETERMINE"
+    },
+    {
+      "container": "flowiseai/flowise",
+      "compose_version": "latest",
+      "latest_version": "2.2.7-patch.1",
+      "status": "UNKNOWN (using latest tag)"
+    },
+    {
+      "container": "searxng/searxng",
+      "compose_version": "latest",
+      "latest_version": "2025.4.18-5ae3b3f17",
+      "status": "UNKNOWN (using latest tag)"
+    },
+    {
+      "container": "prom/prometheus",
+      "compose_version": "latest",
+      "latest_version": "v3.3.0",
+      "status": "UNKNOWN (using latest tag)"
+    },
+    {
+      "container": "dpage/pgadmin4",
+      "compose_version": "latest",
+      "latest_version": "9.2.0",
+      "status": "UNKNOWN (using latest tag)"
+    },
+    {
+      "container": "nginx",
+      "compose_version": "alpine",
+      "latest_version": "1.26.3-alpine3.20-perl",
+      "status": "UNKNOWN (can't compare versions)"
+    },
+    {
+      "container": "nicolargo/glances",
+      "compose_version": "latest",
+      "latest_version": "4.3.1",
+      "status": "UNKNOWN (using latest tag)"
+    },
+    {
+      "container": "linuxserver/duplicati",
+      "compose_version": "latest",
+      "latest_version": "2.1.0",
+      "status": "UNKNOWN (using latest tag)"
+    }
+  ]
+}

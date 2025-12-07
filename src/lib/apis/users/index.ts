@@ -166,33 +166,11 @@ export const getUsers = async (
 	return res;
 };
 
-export const searchUsers = async (
-	token: string,
-	query?: string,
-	orderBy?: string,
-	direction?: string,
-	page = 1
-) => {
+export const getAllUsers = async (token: string) => {
 	let error = null;
 	let res = null;
 
-	const searchParams = new URLSearchParams();
-
-	searchParams.set('page', `${page}`);
-
-	if (query) {
-		searchParams.set('query', query);
-	}
-
-	if (orderBy) {
-		searchParams.set('order_by', orderBy);
-	}
-
-	if (direction) {
-		searchParams.set('direction', direction);
-	}
-
-	res = await fetch(`${WEBUI_API_BASE_URL}/users/search?${searchParams.toString()}`, {
+	res = await fetch(`${WEBUI_API_BASE_URL}/users/all`, {
 		method: 'GET',
 		headers: {
 			'Content-Type': 'application/json',
@@ -216,11 +194,11 @@ export const searchUsers = async (
 	return res;
 };
 
-export const getAllUsers = async (token: string) => {
+export const searchUsers = async (token: string, query: string) => {
 	let error = null;
 	let res = null;
 
-	res = await fetch(`${WEBUI_API_BASE_URL}/users/all`, {
+	res = await fetch(`${WEBUI_API_BASE_URL}/users/search?query=${encodeURIComponent(query)}`, {
 		method: 'GET',
 		headers: {
 			'Content-Type': 'application/json',
@@ -309,36 +287,6 @@ export const getUserById = async (token: string, userId: string) => {
 			'Content-Type': 'application/json',
 			Authorization: `Bearer ${token}`
 		}
-	})
-		.then(async (res) => {
-			if (!res.ok) throw await res.json();
-			return res.json();
-		})
-		.catch((err) => {
-			console.error(err);
-			error = err.detail;
-			return null;
-		});
-
-	if (error) {
-		throw error;
-	}
-
-	return res;
-};
-
-export const updateUserStatus = async (token: string, formData: object) => {
-	let error = null;
-
-	const res = await fetch(`${WEBUI_API_BASE_URL}/users/user/status/update`, {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-			Authorization: `Bearer ${token}`
-		},
-		body: JSON.stringify({
-			...formData
-		})
 	})
 		.then(async (res) => {
 			if (!res.ok) throw await res.json();

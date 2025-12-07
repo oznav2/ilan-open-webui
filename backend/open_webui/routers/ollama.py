@@ -2,6 +2,8 @@
 # Current implementation uses a simple round-robin approach (random.choice). Consider incorporating algorithms like weighted round-robin,
 # least connections, or least response time for better resource utilization and performance optimization.
 
+import logging
+
 import asyncio
 import json
 import logging
@@ -67,6 +69,8 @@ from open_webui.env import (
 )
 from open_webui.constants import ERROR_MESSAGES
 
+from packaging.version import Version, InvalidVersion
+
 log = logging.getLogger(__name__)
 log.setLevel(SRC_LOG_LEVELS["OLLAMA"])
 
@@ -97,8 +101,7 @@ async def send_get_request(url, key=None, user: UserModel = None):
             ) as response:
                 return await response.json()
     except Exception as e:
-        # Handle connection error here
-        log.error(f"Connection error: {e}")
+        log.error(f"Unexpected error for {url}: {str(e)}")
         return None
 
 
@@ -554,74 +557,98 @@ async def get_ollama_loaded_models(request: Request, user=Depends(get_admin_user
 @router.get("/api/version")
 @router.get("/api/version/{url_idx}")
 async def get_ollama_versions(request: Request, url_idx: Optional[int] = None):
-    if request.app.state.config.ENABLE_OLLAMA_API:
-        if url_idx is None:
-            # returns lowest version
-            request_tasks = []
+    """Get Ollama version with improved error handling and load balancing"""
+    FALLBACK_VERSION = "0.5.4"
+    
+    def safe_get_version(response: Optional[dict]) -> str:
+        """Safely get version from response"""
+        if not response or not isinstance(response, dict):
+            return FALLBACK_VERSION
+        return response.get("version", FALLBACK_VERSION)
 
-            for idx, url in enumerate(request.app.state.config.OLLAMA_BASE_URLS):
-                api_config = request.app.state.config.OLLAMA_API_CONFIGS.get(
-                    str(idx),
-                    request.app.state.config.OLLAMA_API_CONFIGS.get(
-                        url, {}
-                    ),  # Legacy support
-                )
+    def parse_version_number(version_str: str) -> tuple:
+        """Safely parse version string into comparable tuple"""
+        try:
+            # Remove 'v' prefix and everything after '-' if present
+            cleaned = re.sub(r"^v|-.*", "", version_str)
+            return tuple(map(int, cleaned.split(".")))
+        except (ValueError, AttributeError) as e:
+            log.warning(f"Error parsing version {version_str}: {e}")
+            return tuple(map(int, FALLBACK_VERSION.split(".")))
 
-                enable = api_config.get("enable", True)
-                key = api_config.get("key", None)
+    if not request.app.state.config.ENABLE_OLLAMA_API:
+        return {"version": FALLBACK_VERSION}
 
-                if enable:
-                    request_tasks.append(
-                        send_get_request(
-                            f"{url}/api/version",
-                            key,
-                        )
+    if url_idx is None:
+        # returns lowest version
+        request_tasks = []
+
+        for idx, url in enumerate(request.app.state.config.OLLAMA_BASE_URLS):
+            api_config = request.app.state.config.OLLAMA_API_CONFIGS.get(
+                str(idx),
+                request.app.state.config.OLLAMA_API_CONFIGS.get(
+                    url, {}
+                ),  # Legacy support
+            )
+
+            enable = api_config.get("enable", True)
+            key = api_config.get("key", None)
+
+            if enable:
+                request_tasks.append(
+                    send_get_request(
+                        f"{url}/api/version",
+                        key,
                     )
-
-            responses = await asyncio.gather(*request_tasks)
-            responses = list(filter(lambda x: x is not None, responses))
-
-            if len(responses) > 0:
-                lowest_version = min(
-                    responses,
-                    key=lambda x: tuple(
-                        map(int, re.sub(r"^v|-.*", "", x["version"]).split("."))
-                    ),
                 )
 
-                return {"version": lowest_version["version"]}
-            else:
-                raise HTTPException(
-                    status_code=500,
-                    detail=ERROR_MESSAGES.OLLAMA_NOT_FOUND,
-                )
-        else:
-            url = request.app.state.config.OLLAMA_BASE_URLS[url_idx]
+        responses = await asyncio.gather(*request_tasks)
+        
+        # Filter out invalid responses
+        valid_responses = [r for r in responses if r is not None]
 
-            r = None
-            try:
-                r = requests.request(method="GET", url=f"{url}/api/version")
-                r.raise_for_status()
+        if not valid_responses:
+            log.warning("No valid responses received")
+            return {"version": FALLBACK_VERSION}
 
-                return r.json()
-            except Exception as e:
-                log.exception(e)
+        try:
+            # Use safe version comparison
+            lowest_version = min(
+                valid_responses,
+                key=lambda x: tuple(
+                    map(int, re.sub(r"^v|-.*", "", x["version"]).split("."))
+                ),
+            )
 
-                detail = None
-                if r is not None:
-                    try:
-                        res = r.json()
-                        if "error" in res:
-                            detail = f"Ollama: {res['error']}"
-                    except Exception:
-                        detail = f"Ollama: {e}"
-
-                raise HTTPException(
-                    status_code=r.status_code if r else 500,
-                    detail=detail if detail else "Open WebUI: Server Connection Error",
-                )
+            return {"version": lowest_version["version"]}
+        except Exception as e:
+            log.error(f"Error processing version responses: {e}")
+            return {"version": FALLBACK_VERSION}
     else:
-        return {"version": False}
+        url = request.app.state.config.OLLAMA_BASE_URLS[url_idx]
+
+        r = None
+        try:
+            r = requests.request(method="GET", url=f"{url}/api/version")
+            r.raise_for_status()
+
+            return r.json()
+        except Exception as e:
+            log.exception(e)
+
+            detail = None
+            if r is not None:
+                try:
+                    res = r.json()
+                    if "error" in res:
+                        detail = f"Ollama: {res['error']}"
+                except Exception:
+                    detail = f"Ollama: {e}"
+
+            raise HTTPException(
+                status_code=r.status_code if r else 500,
+                detail=detail if detail else "Open WebUI: Server Connection Error",
+            )
 
 
 class ModelNameForm(BaseModel):
@@ -879,7 +906,6 @@ async def delete_model(
     url = request.app.state.config.OLLAMA_BASE_URLS[url_idx]
     key = get_api_key(url_idx, url, request.app.state.config.OLLAMA_API_CONFIGS)
 
-    r = None
     try:
         headers = {
             "Content-Type": "application/json",
@@ -893,7 +919,7 @@ async def delete_model(
             method="DELETE",
             url=f"{url}/api/delete",
             headers=headers,
-            json=form_data,
+            data=form_data.model_dump_json(exclude_none=True).encode(),
         )
         r.raise_for_status()
 
@@ -950,7 +976,10 @@ async def show_model_info(
             headers = include_user_info_headers(headers, user)
 
         r = requests.request(
-            method="POST", url=f"{url}/api/show", headers=headers, json=form_data
+            method="POST",
+            url=f"{url}/api/show",
+            headers=headers,
+            data=form_data.model_dump_json(exclude_none=True).encode(),
         )
         r.raise_for_status()
 
@@ -1803,3 +1832,48 @@ async def upload_model(
             yield f"data: {json.dumps(res)}\n\n"
 
     return StreamingResponse(file_process_stream(), media_type="text/event-stream")
+
+
+@router.get("/api/models")
+async def get_models(request: Request):
+    """Get all available models with improved error handling"""
+    try:
+        # Initialize default response
+        default_response = {"models": [], "error": None}
+
+        if not request.app.state.config.ENABLE_OLLAMA_API:
+            log.warning("Ollama API is disabled")
+            default_response["error"] = "Ollama API is disabled"
+            return default_response
+
+        # Get cached models if available
+        cached_models = getattr(request.app.state, "OLLAMA_MODELS", None)
+        if cached_models:
+            return {"models": list(cached_models.values()), "error": None}
+
+        # Fetch fresh models
+        models = await get_all_models(request)
+        if not models or not isinstance(models, dict):
+            log.error("Failed to fetch models")
+            default_response["error"] = "Failed to fetch models"
+            return default_response
+
+        # Ensure we have a valid models list
+        models_list = models.get("models", [])
+        if not isinstance(models_list, list):
+            log.error("Invalid models format received")
+            default_response["error"] = "Invalid models format received"
+            return default_response
+
+        # Update cache and return response
+        request.app.state.OLLAMA_MODELS = {
+            model.get("model", ""): model 
+            for model in models_list 
+            if isinstance(model, dict) and "model" in model
+        }
+
+        return {"models": models_list, "error": None}
+
+    except Exception as e:
+        log.error(f"Error in get_models: {str(e)}")
+        return {"models": [], "error": str(e)}

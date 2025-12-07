@@ -18,6 +18,7 @@ __pycache__/
 CLAUDE.md
 # C extensions
 *.so
+.env.supabase
 
 # Pyodide distribution
 static/pyodide/*
@@ -143,6 +144,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+.env.bak
 
 # Spyder project settings
 .spyderproject
@@ -249,6 +251,9 @@ web_modules/
 # Yarn Integrity file
 .yarn-integrity
 
+# Ignore local Neo4j import directory (may have restricted permissions)
+neo4j-import/
+
 # dotenv environment variable files
 .env
 .env.development.local
@@ -310,3 +315,74 @@ dist
 cypress/videos
 cypress/screenshots
 .vscode/settings.json
+
+system-report.md
+
+# Ignore private_server directory and all its contents
+private_server/
+config/mcpo_config.json
+PERSISTENT-DOCKER-SETUP.md
+
+
+Docker_Usage.md
+
+docker-compose-fixed.yaml
+docker-compose-ilan-full.yaml
+docker-compose-ilan-git-contain-localai.yaml
+docker-compose-ilan-git-contain.yaml
+docker-compose-ilan-git.yaml
+docker-compose-ilan-stack-backup.yaml
+docker-compose-ilan-stack-with-supabase.yaml.bak
+docker-compose-ilan.yaml
+docker-compose-n8n-custom.yaml
+docker-compose-supabase-debug.yaml
+
+docker-mcp-wrapper.sh
+
+ai-stack-recommendations.md
+ai-stack-recommendations.md
+CHANGELOG_Hebrew.md
+CHANGELOG.he.md
+
+docker-compose-fixed.yaml
+Dockerfile.jupyter
+Dockerfile.libretranslate
+Dockerfile.local
+Dockerfile.mcpo
+
+new_theme_adding.md
+supabase_original_docker_compose.yml
+
+tunnel_url.txt
+ultimate_openwebui_heb.md
+ultimate_stack.md
+
+.claude
+supabase_logs
+
+models
+
+system-overview.py
+errors-systemoverview.txt
+
+# --- Personal / Custom Ignored Files ---
+.supabase.env
+*Backup.json
+backup-config.json
+docker-compose-ilan-stack.yaml
+litellm-config.yaml
+localai.env
+memories.json
+n8n_backup/
+neo4j_data/
+nginx-proxy-conf/
+open-webui-backup.json
+pgadmin-config/
+searxng.env
+supabase.env
+private_server/
+models/
+data/
+*backup.json
+~/
+config/gcp-oauth.keys.json

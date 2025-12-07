@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Docker Version Report</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1, h2 {
+            color: #2c3e50;
+        }
+        .container {
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        .status {
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 3px;
+            display: inline-block;
+        }
+        .up-to-date {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .update-available {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .unknown {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .newer {
+            background-color: #e2e3e5;
+            color: #383d41;
+        }
+        .metadata {
+            font-size: 0.9em;
+            color: #6c757d;
+            margin-top: 10px;
+        }
+        .summary {
+            font-size: 1.1em;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Docker Version Report</h1>
+    <div class="container">
+        <h2>Overview</h2>
+        <p>Scan date: 2025-04-20 21:09:33</p>
+        <p>Docker Compose file: docker-compose-ilan-stack.yaml</p>
+        <p class="summary">Containers scanned: 18</p>
+        <p class="summary">Updates available: 0</p>
+    </div>
+    
+    <div class="container">
+        <h2>Version Comparison Results</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Container</th>
+                    <th>Docker Compose Version</th>
+                    <th>Latest Available Version</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+                <tr>
+                    <td>postgres</td>
+                    <td>16.1</td>
+                    <td>14.17-bookworm</td>
+                    <td><span class="status unknown">UNKNOWN (can't compare versions)</span></td>
+                </tr>
+            
+                <tr>
+                    <td>redis</td>
+                    <td>alpine</td>
+                    <td>7.4.2-bookworm</td>
+                    <td><span class="status unknown">UNKNOWN (can't compare versions)</span></td>
+                </tr>
+            
+                <tr>
+                    <td>qdrant/qdrant</td>
+                    <td>latest</td>
+                    <td>v1.13.6-unprivileged</td>
+                    <td><span class="status unknown">UNKNOWN (using latest tag)</span></td>
+                </tr>
+            
+                <tr>
+                    <td>ollama/ollama</td>
+                    <td>latest</td>
+                    <td>0.6.6</td>
+                    <td><span class="status unknown">UNKNOWN (using latest tag)</span></td>
+                </tr>
+            
+                <tr>
+                    <td>ghcr.io/berriai/litellm</td>
+                    <td>main-latest</td>
+                    <td>UNKNOWN</td>
+                    <td><span class="status error">COULDN'T DETERMINE</span></td>
+                </tr>
+            
+                <tr>
+                    <td>apache/tika</td>
+                    <td>latest-full</td>
+                    <td>3.1.0.0-full</td>
+                    <td><span class="status unknown">UNKNOWN (can't compare versions)</span></td>
+                </tr>
+            
+                <tr>
+                    <td>mcr.microsoft.com/playwright</td>
+                    <td>v1.49.1-noble</td>
+                    <td>UNKNOWN</td>
+                    <td><span class="status error">COULDN'T DETERMINE</span></td>
+                </tr>
+            
+                <tr>
+                    <td>ghcr.io/open-webui/pipelines</td>
+                    <td>latest-cuda</td>
+                    <td>UNKNOWN</td>
+                    <td><span class="status error">COULDN'T DETERMINE</span></td>
+                </tr>
+            
+                <tr>
+                    <td>n8nio/n8n</td>
+                    <td>latest</td>
+                    <td>1.89.2</td>
+                    <td><span class="status unknown">UNKNOWN (using latest tag)</span></td>
+                </tr>
+            
+                <tr>
+                    <td>quay.io/unstructured-io/unstructured-api</td>
+                    <td>latest</td>
+                    <td>latest</td>
+                    <td><span class="status unknown">UNKNOWN (using latest tag)</span></td>
+                </tr>
+            
+                <tr>
+                    <td>ghcr.io/linkwarden/linkwarden</td>
+                    <td>latest</td>
+                    <td>UNKNOWN</td>
+                    <td><span class="status error">COULDN'T DETERMINE</span></td>
+                </tr>
+            
+                <tr>
+                    <td>flowiseai/flowise</td>
+                    <td>latest</td>
+                    <td>2.2.7-patch.1</td>
+                    <td><span class="status unknown">UNKNOWN (using latest tag)</span></td>
+                </tr>
+            
+                <tr>
+                    <td>searxng/searxng</td>
+                    <td>latest</td>
+                    <td>2025.4.18-5ae3b3f17</td>
+                    <td><span class="status unknown">UNKNOWN (using latest tag)</span></td>
+                </tr>
+            
+                <tr>
+                    <td>prom/prometheus</td>
+                    <td>latest</td>
+                    <td>v3.3.0</td>
+                    <td><span class="status unknown">UNKNOWN (using latest tag)</span></td>
+                </tr>
+            
+                <tr>
+                    <td>dpage/pgadmin4</td>
+                    <td>latest</td>
+                    <td>9.2.0</td>
+                    <td><span class="status unknown">UNKNOWN (using latest tag)</span></td>
+                </tr>
+            
+                <tr>
+                    <td>nginx</td>
+                    <td>alpine</td>
+                    <td>1.26.3-alpine3.20-perl</td>
+                    <td><span class="status unknown">UNKNOWN (can't compare versions)</span></td>
+                </tr>
+            
+                <tr>
+                    <td>nicolargo/glances</td>
+                    <td>latest</td>
+                    <td>4.3.1</td>
+                    <td><span class="status unknown">UNKNOWN (using latest tag)</span></td>
+                </tr>
+            
+                <tr>
+                    <td>linuxserver/duplicati</td>
+                    <td>latest</td>
+                    <td>2.1.0</td>
+                    <td><span class="status unknown">UNKNOWN (using latest tag)</span></td>
+                </tr>
+            
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="metadata">
+        <p>Generated by Docker Version Checker on 2025-04-20 21:09:33</p>
+    </div>
+</body>
+</html>

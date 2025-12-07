@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { decodeString } from '$lib/utils';
-
 	export let id;
 
 	export let title: string = 'N/A';
@@ -17,14 +15,6 @@
 		return domain;
 	}
 
-	const getDisplayTitle = (title: string) => {
-		if (!title) return 'N/A';
-		if (title.length > 30) {
-			return title.slice(0, 15) + '...' + title.slice(-10);
-		}
-		return title;
-	};
-
 	// Helper function to check if text is a URL and return the domain
 	function formattedTitle(title: string): string {
 		if (title.startsWith('http')) {
@@ -33,6 +23,14 @@
 
 		return title;
 	}
+
+	const getDisplayTitle = (title: string) => {
+		if (!title) return 'N/A';
+		if (title.length > 30) {
+			return title.slice(0, 15) + '...' + title.slice(-10);
+		}
+		return title;
+	};
 </script>
 
 {#if title !== 'N/A'}
@@ -43,7 +41,7 @@
 		}}
 	>
 		<span class="line-clamp-1">
-			{getDisplayTitle(formattedTitle(decodeString(title)))}
+			{getDisplayTitle(formattedTitle(decodeURIComponent(title)))}
 		</span>
 	</button>
 {/if}

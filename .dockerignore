@@ -18,3 +18,8 @@ uploads
 **/*.db
 _test
 backend/data/*
+
+# Ignore private_server directory and all its contents
+private_server/
+
+Docker_Usage.md

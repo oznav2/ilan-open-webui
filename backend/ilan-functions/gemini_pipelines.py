@@ -66,10 +66,8 @@ class Pipe:
     # Configuration valves for the pipeline
     class Valves(BaseModel):
         GOOGLE_API_KEY: str = Field(
-            default=os.getenv(
-                "GOOGLE_API_KEY", "YOUR_GOOGLE_API_KEY_HERE"
-            ),
-            description="API key for Google Generative AI (used if USE_VERTEX_AI is false).",
+            default=os.getenv("GOOGLE_API_KEY", ""),
+            description="API key for Google Generative AI. Set via GOOGLE_API_KEY environment variable.",
         )
         USE_VERTEX_AI: bool = Field(
             default=os.getenv("GOOGLE_GENAI_USE_VERTEXAI", "false").lower() == "true",
